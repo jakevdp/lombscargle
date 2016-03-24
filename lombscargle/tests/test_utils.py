@@ -6,7 +6,7 @@ from numpy.testing import (assert_allclose, assert_equal,
                            assert_warns, assert_no_warnings)
 import pytest
 
-from .._utils import (factorial, extirpolate, bitceil, trig_sum)
+from ..utils import (factorial, extirpolate, bitceil, trig_sum)
 
 
 try:

@@ -3,7 +3,7 @@ from __future__ import print_function, division
 import warnings
 
 import numpy as np
-from ._utils import trig_sum
+from .utils import trig_sum
 
 
 def lombscargle_fast(t, y, dy=1, f0=0, df=None, Nf=None,
