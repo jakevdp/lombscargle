@@ -40,7 +40,7 @@ def lombscargle_scipy(t, y, freqs, normalization='normalized',
     if normalization == 'unnormalized':
         pass
     elif normalization == 'normalized':
-        p *= 2 / (t.size * y.var())
+        p *= 2 / (t.size * np.mean(y ** 2))
     else:
         raise ValueError("normalization='{0}' "
                          "not recognized".format(normalization))

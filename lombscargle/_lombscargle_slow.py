@@ -86,7 +86,6 @@ def lombscargle_slow(t, y, freq, dy=None, normalization='normalized',
     cos_omega_t_tau = np.cos(omega_t_tau)
 
     Y = np.dot(w.T, y)
-    YY = np.dot(w.T, y * y) - Y * Y
 
     wy = w * y
 
@@ -104,5 +103,13 @@ def lombscargle_slow(t, y, freq, dy=None, normalization='normalized',
         CCtau -= Ctau * Ctau
         SStau -= Stau * Stau
 
-    p_omega = (YCtau * YCtau / CCtau + YStau * YStau / SStau) / YY
-    return p_omega.reshape(freqshape)
+    p = (YCtau * YCtau / CCtau + YStau * YStau / SStau)
+
+    if normalization == 'normalized':
+        p /= np.dot(w.T, y * y)
+    elif normalization == 'unnormalized':
+        p *= 0.5 * t.size
+    else:
+        raise ValueError("normalization='{0}' "
+                         "not recognized".format(normalization))
+    return p.reshape(freqshape)
