@@ -50,3 +50,7 @@ distribute-*.tar.gz
 
 # Mac OSX
 .DS_Store
+
+# ipython stuff
+.ipynb_checkpoints
+Untitled*.ipynb

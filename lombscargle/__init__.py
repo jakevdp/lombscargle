@@ -12,4 +12,5 @@ from ._astropy_init import *
 
 # For egg_info test builds to pass, put package imports here.
 if not _ASTROPY_SETUP_:
-    from .lombscargle import lomb_scargle
+    from ._lombscargle_slow import lombscargle_slow
+    from ._lombscargle_scipy import lombscargle_scipy
