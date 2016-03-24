@@ -52,8 +52,8 @@ def lombscargle_slow(t, y, freq, dy=1, normalization='normalized',
     w = dy ** -2.0
     w /= w.sum()
 
+    # if fit_bias is true, centering the data now simplifies the math below.
     if fit_bias or center_data:
-        # subtract MLE for mean in the presence of noise.
         y = y - np.dot(w, y)
 
     omega = 2 * np.pi * freq

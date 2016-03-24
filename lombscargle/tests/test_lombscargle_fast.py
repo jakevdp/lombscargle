@@ -21,9 +21,11 @@ def data(N=100, period=1, theta=[10, 2, 3], dy=1, rseed=0):
 
 @pytest.mark.parametrize('center_data', [True, False])
 @pytest.mark.parametrize('fit_bias', [True, False])
-def test_lombscargle_fast(center_data, fit_bias, data):
+@pytest.mark.parametrize('normalization', ['normalized', 'unnormalized'])
+def test_lombscargle_fast(center_data, fit_bias, normalization, data):
     t, y, dy = data
-    kwds = dict(center_data=center_data, fit_bias=fit_bias)
+    kwds = dict(center_data=center_data, fit_bias=fit_bias,
+                normalization=normalization)
     f0 = 0.8
     df = 0.01
     N = 40
@@ -34,6 +36,8 @@ def test_lombscargle_fast(center_data, fit_bias, data):
                                  f0=f0, df=df, Nf=N, **kwds)
     P3 = lombscargle_slow(t, y, dy=dy, freq=freq1, **kwds)
 
+    Pmax = P1.max()
+
     assert_allclose(freq1, freq2)
-    assert_allclose(P1, P2, atol=0.005)
-    assert_allclose(P1, P3, atol=0.005)
+    assert_allclose(P1 / Pmax, P2 / Pmax, atol=0.01, rtol=1E-3)
+    assert_allclose(P1 / Pmax, P3 / Pmax, atol=0.01, rtol=1E-3)

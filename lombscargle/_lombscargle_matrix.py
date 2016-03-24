@@ -51,7 +51,7 @@ def lombscargle_matrix(t, y, freq, dy=None, normalization='normalized',
     w = 1.0 * dy ** -2.0
     w /= w.sum()
 
-    # compute reference chi-square
+    # if fit_bias is true, centering the data now simplifies the math below.
     if center_data or fit_bias:
         yw = (y - np.dot(w, y)) / dy
     else:

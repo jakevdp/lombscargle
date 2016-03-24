@@ -8,6 +8,7 @@ from ._utils import trig_sum
 
 def lombscargle_fast(t, y, dy=1, f0=0, df=None, Nf=None,
                      center_data=True, fit_bias=True,
+                     normalization='normalized',
                      use_fft=True, freq_oversampling=5, nyquist_factor=2,
                      trig_sum_kwds=None):
     """Compute a lomb-scargle periodogram for the given data
@@ -30,6 +31,9 @@ def lombscargle_fast(t, y, dy=1, f0=0, df=None, Nf=None,
           ``nyquist_factor`` defaults to 2.
         Note that for unevenly-spaced data, the periodogram can be sensitive
         to frequencies far higher than the average Nyquist frequency.
+    normalization : string (optional, default='normalized')
+        Normalization to use for the periodogram
+        TODO: figure out what options to use
     center_data : bool (default=True)
         Specify whether to subtract the mean of the data before the fit
     fit_bias : bool (default=True)
@@ -135,10 +139,18 @@ def lombscargle_fast(t, y, dy=1, f0=0, df=None, Nf=None,
         if fit_bias and f0 == 0:
             warnings.simplefilter("ignore")
 
-        power = (YC * YC / CC + YS * YS / SS) / YY
+        power = (YC * YC / CC + YS * YS / SS)
 
         # fix NaN and INF at zero frequency
         if np.isnan(power[0]) or np.isinf(power[0]):
             power[0] = 0
+
+    if normalization == 'normalized':
+        power /= YY
+    elif normalization == 'unnormalized':
+        power *= 0.5 * t.size
+    else:
+        raise ValueError("normalization='{0}' "
+                         "not recognized".format(normalization))
 
     return freq, power
