@@ -48,20 +48,15 @@ def lombscargle_matrix(t, y, freq, dy=None, normalization='normalized',
     freq = np.asarray(freq)
     freqshape = freq.shape
 
-    w = dy ** -2.0
+    w = 1.0 * dy ** -2.0
     w /= w.sum()
 
-    # compute refrence chi-squared
+    # compute reference chi-square
     if center_data or fit_bias:
-        yref = w * (y - np.dot(w, y))
+        yw = (y - np.dot(w, y)) / dy
     else:
-        yref = w * y
-    chi2_ref = np.dot(yref, yref)
-
-    if center_data:
-        yw = w * (y - np.dot(w, y))
-    else:
-        yw = w * y
+        yw = y / dy
+    chi2_ref = np.dot(yw, yw)
 
     # compute the model chi2 at each frequency
     def compute_power(f):
@@ -76,7 +71,7 @@ def lombscargle_matrix(t, y, freq, dy=None, normalization='normalized',
     p = np.array([compute_power(f) for f in freq])
 
     if normalization == 'unnormalized':
-        p *= 0.5 * t.size ** 2
+        p *= 0.5
     elif normalization == 'normalized':
         p /= chi2_ref
     else:

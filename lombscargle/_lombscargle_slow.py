@@ -3,7 +3,7 @@ from __future__ import print_function, division
 import numpy as np
 
 
-def lombscargle_slow(t, y, freq, dy=None, normalization='normalized',
+def lombscargle_slow(t, y, freq, dy=1, normalization='normalized',
                      fit_bias=True, center_data=True):
     """Lomb-Scargle Periodogram
 
@@ -43,8 +43,6 @@ def lombscargle_slow(t, y, freq, dy=None, normalization='normalized',
     .. [2] W. Press et al, Numerical Recipies in C (2002)
     .. [3] Scargle, J.D. 1982, ApJ 263:835-853
     """
-    if dy is None:
-        dy = 1
     t, y, dy = np.broadcast_arrays(t, y, dy)
     assert t.ndim == 1
 
@@ -54,7 +52,7 @@ def lombscargle_slow(t, y, freq, dy=None, normalization='normalized',
     w = dy ** -2.0
     w /= w.sum()
 
-    if center_data:
+    if fit_bias or center_data:
         # subtract MLE for mean in the presence of noise.
         y = y - np.dot(w, y)
 
