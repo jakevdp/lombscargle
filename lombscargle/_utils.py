@@ -76,6 +76,10 @@ def extirpolate(x, y, N=None, M=4):
     This code is based on the C implementation of spread() presented in
     Numerical Recipes in C, Second Edition (Press et al. 1989; p.583).
     """
+    if not hasattr(np.ufunc, 'at'):
+        raise NotImplementedError("extirpolate functionality requires numpy "
+                                  "version 1.8 or newer")
+
     x, y = map(np.ravel, np.broadcast_arrays(x, y))
 
     if N is None:
