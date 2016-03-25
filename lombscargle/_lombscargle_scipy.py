@@ -32,6 +32,11 @@ def lombscargle_scipy(t, y, freq, normalization='normalized',
         raise ValueError("scipy not available")
 
     t, y = np.broadcast_arrays(t, y)
+    assert t.ndim == 1
+
+    freq = np.asarray(freq)
+    input_shape = freq.shape
+    freq = freq.ravel()
 
     if center_data:
         y = y - y.mean()
@@ -46,4 +51,4 @@ def lombscargle_scipy(t, y, freq, normalization='normalized',
     else:
         raise ValueError("normalization='{0}' "
                          "not recognized".format(normalization))
-    return p
+    return p.reshape(input_shape)

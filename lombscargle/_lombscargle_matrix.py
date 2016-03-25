@@ -43,10 +43,8 @@ def lombscargle_matrix(t, y, freq, dy=None, normalization='normalized',
     assert t.ndim == 1
 
     freq = np.asarray(freq)
-    freqshape = freq.shape
-
-    freq = np.asarray(freq)
-    freqshape = freq.shape
+    input_shape = freq.shape
+    freq = freq.ravel()
 
     w = 1.0 * dy ** -2.0
     w /= w.sum()
@@ -77,4 +75,4 @@ def lombscargle_matrix(t, y, freq, dy=None, normalization='normalized',
     else:
         raise ValueError("normalization='{0}' "
                          "not recognized".format(normalization))
-    return p
+    return p.reshape(input_shape)

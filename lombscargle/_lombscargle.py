@@ -15,8 +15,9 @@ METHODS = {'slow': lombscargle_slow,
 
 def _get_frequency_grid(frequency, assume_regular_frequency=False):
     frequency = np.asarray(frequency)
-
-    if np.isscalar(frequency):
+    if frequency.ndim >= 2:
+        raise ValueError("frequency grid must be 0 or 1 dimensions")
+    elif frequency.ndim == 0:
         return frequency, frequency, 1
     elif len(frequency) == 1:
         return frequency[0], frequency[0], 1
@@ -87,6 +88,11 @@ def lombscargle(t, y, dy=None,
     """
     t = np.asarray(t)
     y = np.asarray(y)
+    assert t.ndim == 1
+
+    frequency = np.asarray(frequency)
+    input_shape = frequency.shape
+    frequency = frequency.ravel()
 
     if method == 'auto':
         # TODO: better choices here
@@ -124,4 +130,4 @@ def lombscargle(t, y, dy=None,
                               fit_bias=fit_bias,
                               normalization=normalization)
 
-    return frequency, PLS
+    return frequency.reshape(input_shape), PLS.reshape(input_shape)
