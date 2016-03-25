@@ -4,7 +4,7 @@ import numpy as np
 
 
 def frequency_heuristic(n_samples, baseline,
-                        samples_per_peak=5
+                        samples_per_peak=5,
                         nyquist_factor=5,
                         minimum_frequency=None,
                         maximum_frequency=None):
