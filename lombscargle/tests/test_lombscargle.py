@@ -38,7 +38,7 @@ def test_output_shapes(lombscargle_method, shape, data):
 
 
 @pytest.mark.parametrize('method', METHOD_NAMES)
-@pytest.mark.parametrize('shape', [(), (1,), (2,), (3,), (4,)])
+@pytest.mark.parametrize('shape', [(), (1,), (2,), (3,), (2, 3)])
 def test_output_shapes(method, shape, data):
     t, y, dy = data
     freq = np.asarray(np.random.rand(*shape))

@@ -3,7 +3,7 @@ from __future__ import print_function, division
 import numpy as np
 
 
-def lombscargle_matrix(t, y, freq, dy=None, normalization='normalized',
+def lombscargle_matrix(t, y, freq, dy=1, normalization='normalized',
                        fit_bias=True, center_data=True):
     """Lomb-Scargle Periodogram
 
@@ -37,16 +37,12 @@ def lombscargle_matrix(t, y, freq, dy=None, normalization='normalized',
         Lomb-Scargle power associated with each frequency omega.
         Units of the result depend on the normalization.
     """
-    if dy is None:
-        dy = 1
     t, y, dy = np.broadcast_arrays(t, y, dy)
-    assert t.ndim == 1
-
     freq = np.asarray(freq)
-    input_shape = freq.shape
-    freq = freq.ravel()
+    assert t.ndim == 1
+    assert freq.ndim == 1
 
-    w = 1.0 * dy ** -2.0
+    w = dy ** -2.0
     w /= w.sum()
 
     # if fit_bias is true, centering the data now simplifies the math below.
@@ -75,4 +71,4 @@ def lombscargle_matrix(t, y, freq, dy=None, normalization='normalized',
     else:
         raise ValueError("normalization='{0}' "
                          "not recognized".format(normalization))
-    return p.reshape(input_shape)
+    return p

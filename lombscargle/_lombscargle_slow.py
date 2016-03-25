@@ -45,10 +45,8 @@ def lombscargle_slow(t, y, freq, dy=1, normalization='normalized',
     """
     t, y, dy = np.broadcast_arrays(t, y, dy)
     assert t.ndim == 1
-
     freq = np.asarray(freq)
-    input_shape = freq.shape
-    freq = freq.ravel()
+    assert freq.ndim == 1
 
     w = dy ** -2.0
     w /= w.sum()
@@ -113,4 +111,4 @@ def lombscargle_slow(t, y, freq, dy=1, normalization='normalized',
     else:
         raise ValueError("normalization='{0}' "
                          "not recognized".format(normalization))
-    return p.reshape(input_shape)
+    return p.ravel()

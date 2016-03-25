@@ -54,7 +54,8 @@ def lombscargle_fast(t, y, dy, f0, df, Nf,
     """
     # Validate and setup input data
     t, y, dy = map(np.ravel, np.broadcast_arrays(t, y, dy))
-    w = np.asarray(dy ** -2, dtype=float)
+
+    w = dy ** -2.0
     w /= w.sum()
 
     # Validate and setup frequency grid
