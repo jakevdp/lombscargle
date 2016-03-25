@@ -53,16 +53,17 @@ def lombscargle_fast(t, y, dy, f0, df, Nf,
     .. [3] W. Press et al, Numerical Recipies in C (2002)
     """
     # Validate and setup input data
-    t, y, dy = map(np.ravel, np.broadcast_arrays(t, y, dy))
-
-    w = dy ** -2.0
-    w /= w.sum()
+    t, y, dy = np.broadcast_arrays(t, y, dy)
+    assert t.ndim == 1
 
     # Validate and setup frequency grid
     assert(f0 >= 0)
     assert(df > 0)
     assert(Nf > 0)
     freq = f0 + df * np.arange(Nf)
+
+    w = dy ** -2.0
+    w /= w.sum()
 
     # Center the data. Even if we're fitting the offset,
     # this step makes the expressions below more succinct

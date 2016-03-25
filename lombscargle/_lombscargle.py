@@ -6,6 +6,8 @@ from ._lombscargle_fast import lombscargle_fast
 from ._lombscargle_scipy import lombscargle_scipy
 from ._lombscargle_matrix import lombscargle_matrix
 
+from astropy import units
+
 
 METHODS = {'slow': lombscargle_slow,
            'fast': lombscargle_fast,
@@ -29,6 +31,58 @@ def _get_frequency_grid(frequency, assume_regular_frequency=False):
     return frequency[0], frequency[1] - frequency[0], len(frequency)
 
 
+def _validate_units(t, y, dy=None, frequency=None, strip_units=True):
+    """Validation of units for inputs
+
+    This makes sure the units of the inputs match, and converts them to
+    equivalent units.
+
+    Parameters
+    ----------
+    t, y : array_like or Quantity
+    dy, frequency : array_like or Quantity (optional)
+    strip_units : bool (optional, default=True)
+        if True, the returned quantities will have units stripped.
+
+    Returns
+    -------
+    t, y, dy, frequency : ndarray or Quantity
+    units : dict
+    """
+    t = units.Quantity(t)
+    y = units.Quantity(y)
+    frequency = units.Quantity(frequency)
+
+    if dy is None:
+        dy = 1 * y.unit
+    else:
+        dy = units.Quantity(dy)
+
+    if not y.unit.is_equivalent(dy.unit):
+        raise ValueError("Units of y not equivalent to units of dy")
+
+    dy = units.Quantity(dy, unit=y.unit)
+
+    if frequency is None:
+        pass
+    elif not t.unit.is_equivalent(1. / frequency.unit):
+        raise ValueError("Units of frequency not equivalent to units of 1/t")
+    else:
+        t = units.Quantity(t, unit=1. / frequency.unit)
+
+    unit_dict = {'t': t.unit,
+                 'y': y.unit,
+                 'dy': dy.unit,
+                 'frequency': 1. / t.unit}
+
+    if strip_units:
+        if frequency is not None:
+            frequency = np.asarray(frequency)
+        t, y, dy = map(np.asarray, (t, y, dy))
+
+    return t, y, dy, frequency, unit_dict
+
+
 def lombscargle(t, y, dy=None,
                 frequency=None,
                 method='auto',
@@ -46,8 +100,8 @@ def lombscargle(t, y, dy=None,
     y : array_like or Quantity
         sequence of observations associated with times t
     dy : float, array_like or Quantity (optional)
-        sequence of observational errors associated with times t
-    frequency : array (optional)
+        error or sequence of observational errors associated with times t
+    frequency : array_like or Quantity (optional)
         frequencies (not angular frequencies) at which to evaluate the
         periodogram. If not specified, optimal frequencies will be chosen using
         a heuristic which will attempt to provide sufficient frequency range
@@ -86,13 +140,15 @@ def lombscargle(t, y, dy=None,
     PLS : array_like
         Lomb-Scargle power associated with each frequency omega
     """
-    t = np.asarray(t)
-    y = np.asarray(y)
+    dy_input = dy
+    t, y, dy, frequency, unit_dict = _validate_units(t, y, dy, frequency,
+                                                     strip_units=True)
+    t, y, dy = np.broadcast_arrays(t, y, dy)
     assert t.ndim == 1
 
-    frequency = np.asarray(frequency)
-    input_shape = frequency.shape
-    frequency = frequency.ravel()
+    if frequency is not None:
+        input_shape = frequency.shape
+        frequency = frequency.ravel()
 
     if method == 'auto':
         # TODO: better choices here
@@ -105,6 +161,7 @@ def lombscargle(t, y, dy=None,
                                baseline=t.max() - t.min(),
                                return_tuple=True)
         frequency = f0 + df * np.arange(Nf)
+        input_shape = (Nf,)
     elif method == 'fast':
         f0, df, Nf = _get_frequency_grid(frequency, assume_regular_frequency)
         frequency = f0 + df * np.arange(Nf)
@@ -118,7 +175,7 @@ def lombscargle(t, y, dy=None,
                                           normalization=normalization)
     elif method == 'scipy':
         assert not fit_bias
-        assert dy is None
+        assert dy_input is None
         PLS = lombscargle_scipy(t, y, freq=frequency,
                                 center_data=center_data,
                                 normalization=normalization)
@@ -130,4 +187,7 @@ def lombscargle(t, y, dy=None,
                               fit_bias=fit_bias,
                               normalization=normalization)
 
-    return frequency.reshape(input_shape), PLS.reshape(input_shape)
+    return (units.Quantity(frequency.reshape(input_shape),
+                           unit_dict['frequency']),
+            units.Quantity(PLS.reshape(input_shape),
+                           units.dimensionless_unscaled))

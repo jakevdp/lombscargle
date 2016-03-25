@@ -3,8 +3,14 @@ import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 from functools import partial
 
-from .. import (lombscargle, lombscargle_slow, lombscargle_scipy,
-                lombscargle_matrix, lombscargle_fast)
+from astropy import units
+
+from .. import lombscargle
+from .._lombscargle_slow import lombscargle_slow
+from .._lombscargle_fast import lombscargle_fast
+from .._lombscargle_scipy import lombscargle_scipy
+from .._lombscargle_matrix import lombscargle_matrix
+
 from ..heuristics import baseline_heuristic
 
 METHOD_NAMES = ['auto', 'fast', 'slow', 'scipy', 'matrix']
@@ -38,6 +44,20 @@ def test_output_shapes(method, shape, data):
                                 fit_bias=False, method=method)
     assert_equal(freq, freq_out)
     assert_equal(PLS.shape, shape)
+
+
+@pytest.mark.parametrize('method', METHOD_NAMES)
+@pytest.mark.parametrize('t_unit', [units.second, units.day])
+@pytest.mark.parametrize('frequency_unit', [units.Hz, 1. / units.second])
+def test_units_match(method, t_unit, frequency_unit, data):
+    t, y, dy = data
+
+    t = t * t_unit
+    frequency = np.linspace(0.5, 1.5, 10) * frequency_unit
+    frequency_out, PLS = lombscargle(t, y, frequency=frequency,
+                                     fit_bias=False, method=method)
+    assert frequency_out.unit == frequency_unit
+    assert_equal(PLS.unit, units.dimensionless_unscaled)
 
 
 @pytest.mark.parametrize('lombscargle_method', METHODS_NOBIAS)
