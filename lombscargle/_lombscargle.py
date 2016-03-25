@@ -1,7 +1,10 @@
 import numpy as np
-from .heuistics import get_heuristic
-from . import (lombscargle_slow, lombscargle_fast,
-               lombscargle_scipy, lombscargle_matrix)
+
+from .heuristics import get_heuristic
+from ._lombscargle_slow import lombscargle_slow
+from ._lombscargle_fast import lombscargle_fast
+from ._lombscargle_scipy import lombscargle_scipy
+from ._lombscargle_matrix import lombscargle_matrix
 
 
 METHODS = {'slow': lombscargle_slow,
@@ -10,13 +13,28 @@ METHODS = {'slow': lombscargle_slow,
            'scipy': lombscargle_scipy}
 
 
+def _get_frequency_grid(frequency, assume_regular_frequency=False):
+    frequency = np.asarray(frequency)
+
+    if np.isscalar(frequency):
+        return frequency, frequency, 1
+    elif len(frequency) == 1:
+        return frequency[0], frequency[0], 1
+    elif not assume_regular_frequency:
+        diff = frequency[1:] - frequency[:-1]
+        if not np.allclose(diff[0], diff):
+            raise ValueError("frequency must be a regular grid")
+
+    return frequency[0], frequency[1] - frequency[0], len(frequency)
+
+
 def lombscargle(t, y, dy=None,
                 frequency=None,
                 method='auto',
                 assume_regular_frequency=False,
                 normalization='normalized',
                 fit_bias=True, center_data=True,
-                frequency_heuistic='baseline'):
+                frequency_heuristic='baseline'):
     """
     Lomb-scargle Periodogram
 
@@ -59,6 +77,7 @@ def lombscargle(t, y, dy=None,
     frequency_heuristic : string (optional, default='baseline')
         the frequency heuristic to use. By default, it is assumed that the
         observation baseline will drive the peak width.
+
     Returns
     -------
     freq : array_like
@@ -71,7 +90,7 @@ def lombscargle(t, y, dy=None,
 
     if method == 'auto':
         # TODO: better choices here
-        method == 'fast'
+        method = 'fast'
 
     if frequency is None:
         # TODO: offer means of passing optional params
@@ -81,8 +100,7 @@ def lombscargle(t, y, dy=None,
                                return_tuple=True)
         frequency = f0 + df * np.arange(Nf)
     elif method == 'fast':
-        f0, df, Nf = _get_frequency_grid(frequency,
-                                         assume_regular_frequency)
+        f0, df, Nf = _get_frequency_grid(frequency, assume_regular_frequency)
         frequency = f0 + df * np.arange(Nf)
 
     if method == 'fast':

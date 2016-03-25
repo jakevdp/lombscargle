@@ -3,7 +3,9 @@ import numpy as np
 from numpy.testing import assert_allclose
 from functools import partial
 
-from .. import lombscargle_slow, lombscargle_scipy, lombscargle_matrix
+from .. import (lombscargle, lombscargle_slow, lombscargle_scipy,
+                lombscargle_matrix, lombscargle_fast)
+from ..heuristics import baseline_heuristic
 
 METHODS_NOBIAS = [partial(lombscargle_slow, fit_bias=False),
                   partial(lombscargle_matrix, fit_bias=False),
@@ -20,6 +22,7 @@ def data(N=100, period=1, theta=[10, 2, 3], dy=1, rseed=0):
     y = theta[0] + theta[1] * np.sin(omega * t) + theta[2] * np.cos(omega * t)
     dy = dy * (0.5 + rng.rand(N))
     y += dy * rng.randn(N)
+
     return t, y, dy
 
 
@@ -28,7 +31,9 @@ def data(N=100, period=1, theta=[10, 2, 3], dy=1, rseed=0):
 @pytest.mark.parametrize('normalization', ['normalized', 'unnormalized'])
 def test_lombscargle_methods_common(lombscargle_method, center_data,
                                     normalization, data):
-    t, y, freq = data
+    t, y, dy = data
+    freq = 0.8 + 0.01 * np.arange(40)
+
     kwds = dict(normalization=normalization, center_data=center_data)
 
     expected_output = lombscargle_slow(t, y, freq, dy=np.ones_like(t),
@@ -45,6 +50,8 @@ def test_lombscargle_methods_common(lombscargle_method, center_data,
 def test_lombscargle_methods_with_bias(lombscargle_method, center_data,
                                        fit_bias, normalization, data):
        t, y, freq = data
+       freq = 0.8 + 0.01 * np.arange(40)
+
        kwds = dict(normalization=normalization, center_data=center_data,
                    fit_bias=fit_bias)
 
@@ -53,3 +60,25 @@ def test_lombscargle_methods_with_bias(lombscargle_method, center_data,
 
        output = lombscargle_method(t, y, freq, **kwds)
        assert_allclose(output, expected_output)
+
+
+@pytest.mark.parametrize('method', ['auto', 'fast', 'slow', 'scipy', 'matrix'])
+@pytest.mark.parametrize('center_data', [True, False])
+@pytest.mark.parametrize('freq', [0.8 + 0.01 * np.arange(40), None])
+def test_common_interface(method, center_data, freq, data):
+    t, y, dy = data
+
+    if freq is None:
+        freq = baseline_heuristic(len(t), t.max() - t.min())
+    
+    expected_PLS = lombscargle_slow(t, y, freq=freq,
+                                    fit_bias=False, center_data=center_data)
+    frequency, PLS = lombscargle(t, y, frequency=freq, method=method,
+                                 fit_bias=False, center_data=center_data)
+    assert_allclose(freq, frequency)
+
+    if method in ['fast', 'auto']:
+        atol = 0.005
+    else:
+        atol = 0
+    assert_allclose(PLS, expected_PLS, atol=atol)

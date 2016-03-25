@@ -9,7 +9,7 @@ except ImportError:
     HAS_SCIPY = False
 
 
-def lombscargle_scipy(t, y, freqs, normalization='normalized',
+def lombscargle_scipy(t, y, freq, normalization='normalized',
                       center_data=True):
     """Lomb Scargle Periodogram computed via scipy
 
@@ -37,7 +37,7 @@ def lombscargle_scipy(t, y, freqs, normalization='normalized',
         y = y - y.mean()
 
     # Note: scipy input accepts angular frequencies
-    p = signal.lombscargle(t, y, 2 * np.pi * freqs)
+    p = signal.lombscargle(t, y, 2 * np.pi * freq)
 
     if normalization == 'unnormalized':
         pass

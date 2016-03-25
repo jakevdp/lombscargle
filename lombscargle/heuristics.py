@@ -47,17 +47,13 @@ def baseline_heuristic(n_samples, baseline,
     maximum_frequency : float (optional)
         If specified, then use this maximum frequency rather than one chosen
         based on the average nyquist frequency.
-    return_tuple : bool (optional, default=False)
-        if True, return a tuple `(freq_min, freq_spacing, N_freq)`. Otherwise,
-        return an array `freq_min + freq_spacing * np.arange(N_freq)`
 
     Returns
     -------
-    freq : ndarray or tuple
-        If `return_tuple` is True, a tuple `(freq_min, freq_spacing, N_freq)`
-        otherwise, an array `freq_min + freq_spacing * np.arange(N_freq)`.
+    freq : ndarray
+        an array `freq_min + freq_spacing * np.arange(N_freq)`.
     """
-    df = 1. / baseline / oversampling
+    df = 1. / baseline / samples_per_peak
 
     if minimum_frequency is not None:
         f0 = minimum_frequency
@@ -67,6 +63,6 @@ def baseline_heuristic(n_samples, baseline,
     if maximum_frequency is not None:
         Nf = int(np.ceil((maximum_frequency - f0) / df))
     else:
-        Nf = int(0.5 * oversampling * nyquist_factor * n_samples)
+        Nf = int(0.5 * samples_per_peak * nyquist_factor * n_samples)
 
     return f0 + df * np.arange(Nf)
