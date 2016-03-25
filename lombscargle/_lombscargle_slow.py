@@ -44,8 +44,8 @@ def lombscargle_slow(t, y, freq, dy=1, normalization='normalized',
     .. [3] Scargle, J.D. 1982, ApJ 263:835-853
     """
     t, y, dy = np.broadcast_arrays(t, y, dy)
-    assert t.ndim == 1
     freq = np.asarray(freq)
+    assert t.ndim == 1
     assert freq.ndim == 1
 
     w = dy ** -2.0

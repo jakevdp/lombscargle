@@ -32,8 +32,8 @@ def lombscargle_scipy(t, y, freq, normalization='normalized',
         raise ValueError("scipy must be installed to use lombscargle_scipy")
 
     t, y = np.broadcast_arrays(t, y)
-    assert t.ndim == 1
     freq = np.asarray(freq)
+    assert t.ndim == 1
     assert freq.ndim == 1
 
     if center_data:

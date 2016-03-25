@@ -28,15 +28,6 @@ def data(N=100, period=1, theta=[10, 2, 3], dy=1, rseed=0):
     return t, y, dy
 
 
-@pytest.mark.parametrize('lombscargle_method', METHODS_NOTFAST)
-@pytest.mark.parametrize('shape', [(), (1,), (2,), (3,), (2, 3)])
-def test_output_shapes(lombscargle_method, shape, data):
-    t, y, dy = data
-    freq = np.random.RandomState(0).rand(*shape)
-    PLS = lombscargle_method(t, y, freq=freq)
-    assert_equal(PLS.shape, shape)
-
-
 @pytest.mark.parametrize('method', METHOD_NAMES)
 @pytest.mark.parametrize('shape', [(), (1,), (2,), (3,), (2, 3)])
 def test_output_shapes(method, shape, data):
