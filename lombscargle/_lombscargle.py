@@ -1,4 +1,13 @@
 import numpy as np
+from .heuistics import get_heuristic
+from . import (lombscargle_slow, lombscargle_fast,
+               lombscargle_scipy, lombscargle_matrix)
+
+
+METHODS = {'slow': lombscargle_slow,
+           'fast': lombscargle_fast,
+           'matrix': lombscargle_matrix,
+           'scipy': lombscargle_scipy}
 
 
 def lombscargle(t, y, dy=None,
@@ -41,9 +50,6 @@ def lombscargle(t, y, dy=None,
         Normalization to use for the periodogram. Options are 'normalized' or
         'unnormalized'.
     fit_bias : bool (optional, default=True)
-        if True, fit the bias (i.e. constant data offset) as part of the model
-        at each frequency.
-    fit_bias : bool (optional, default=True)
         if True, include a constant offet as part of the model at each
         frequency. This can lead to more accurate results, especially in then
         case of incomplete phase coverage.
@@ -60,4 +66,44 @@ def lombscargle(t, y, dy=None,
     PLS : array_like
         Lomb-Scargle power associated with each frequency omega
     """
-    pass
+    t = np.asarray(t)
+    y = np.asarray(y)
+
+    if method == 'auto':
+        # TODO: better choices here
+        method == 'fast'
+
+    if frequency is None:
+        # TODO: offer means of passing optional params
+        heuristic = get_heuristic(frequency_heuristic)
+        f0, df, Nf = heuristic(n_samples=len(t),
+                               baseline=t.max() - t.min(),
+                               return_tuple=True)
+        frequency = f0 + df * np.arange(Nf)
+    elif method == 'fast':
+        f0, df, Nf = _get_frequency_grid(frequency,
+                                         assume_regular_frequency)
+        frequency = f0 + df * np.arange(Nf)
+
+    if method == 'fast':
+        if dy is None:
+            dy = 1
+        frequency, PLS = lombscargle_fast(t, y, dy=dy, f0=f0, df=df, Nf=Nf,
+                                          center_data=center_data,
+                                          fit_bias=fit_bias,
+                                          normalization=normalization)
+    elif method == 'scipy':
+        assert not fit_bias
+        assert dy is None
+        PLS = lombscargle_scipy(t, y, freq=frequency,
+                                center_data=center_data,
+                                normalization=normalization)
+    else:
+        if dy is None:
+            dy = 1
+        PLS = METHODS[method](t, y, dy=dy, freq=frequency,
+                              center_data=center_data,
+                              fit_bias=fit_bias,
+                              normalization=normalization)
+
+    return frequency, PLS

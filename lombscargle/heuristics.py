@@ -3,11 +3,18 @@ from __future__ import division
 import numpy as np
 
 
-def frequency_heuristic(n_samples, baseline,
-                        samples_per_peak=5,
-                        nyquist_factor=5,
-                        minimum_frequency=None,
-                        maximum_frequency=None):
+def get_heuristic(heuristic):
+    if heuristic == 'baseline':
+        return baseline_heuristic
+    else:
+        raise ValueError("Unrecognized heuristic '{0}'".format(heuristic))
+
+
+def baseline_heuristic(n_samples, baseline,
+                       samples_per_peak=5,
+                       nyquist_factor=5,
+                       minimum_frequency=None,
+                       maximum_frequency=None):
     """Use a heuristic to compute a frequency grid.
 
     Note that this assumes that the baseline is much larger than the

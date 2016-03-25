@@ -6,14 +6,14 @@ import numpy as np
 from .utils import trig_sum
 
 
-def lombscargle_fast(t, y, dy=1, f0=0, df=None, Nf=None,
+def lombscargle_fast(t, y, dy, f0, df, Nf,
                      center_data=True, fit_bias=True,
                      normalization='normalized',
-                     use_fft=True, freq_oversampling=5, nyquist_factor=2,
-                     trig_sum_kwds=None):
+                     use_fft=True, trig_sum_kwds=None):
     """Compute a lomb-scargle periodogram for the given data
     This implements both an O[N^2] method if use_fft==False, or an
     O[NlogN] method if use_fft==True.
+
     Parameters
     ----------
     t, y, dy : array_like
@@ -22,44 +22,29 @@ def lombscargle_fast(t, y, dy=1, f0=0, df=None, Nf=None,
         constant error will be used.
     f0, df, Nf : (float, float, int)
         parameters describing the frequency grid, f = f0 + df * arange(Nf).
-        Defaults, with T = t.max() - t.min():
-        - f0 = 0
-        - df is set such that there are ``freq_oversampling`` points per
-          peak width. ``freq_oversampling`` defaults to 5.
-        - Nf is set such that the highest frequency is ``nyquist_factor``
-          times the so-called "average Nyquist frequency".
-          ``nyquist_factor`` defaults to 2.
-        Note that for unevenly-spaced data, the periodogram can be sensitive
-        to frequencies far higher than the average Nyquist frequency.
-    normalization : string (optional, default='normalized')
-        Normalization to use for the periodogram
-        TODO: figure out what options to use
     center_data : bool (default=True)
         Specify whether to subtract the mean of the data before the fit
     fit_bias : bool (default=True)
         If True, then compute the floating-mean periodogram; i.e. let the mean
         vary with the fit.
+    normalization : string (optional, default='normalized')
+        Normalization to use for the periodogram
+        TODO: figure out what options to use
     use_fft : bool (default=True)
         If True, then use the Press & Rybicki O[NlogN] algorithm to compute
         the result. Otherwise, use a slower O[N^2] algorithm
-    Other Parameters
-    ----------------
-    freq_oversampling : float (default=5)
-        Oversampling factor for the frequency bins. Only referenced if
-        ``df`` is not specified
-    nyquist_factor : float (default=2)
-        Parameter controlling the highest probed frequency. Only referenced
-        if ``Nf`` is not specified.
     trig_sum_kwds : dict or None (optional)
         extra keyword arguments to pass to the ``trig_sum`` utility.
         Options are ``oversampling`` and ``Mfft``. See documentation
         of ``trig_sum`` for details.
+
     Notes
     -----
     Note that the ``use_fft=True`` algorithm is an approximation to the true
     Lomb-Scargle periodogram, and as the number of points grows this
     approximation improves. On the other hand, for very small datasets
     (<~50 points or so) this approximation may not be useful.
+
     References
     ----------
     .. [1] Press W.H. and Rybicki, G.B, "Fast algorithm for spectral analysis
@@ -73,13 +58,7 @@ def lombscargle_fast(t, y, dy=1, f0=0, df=None, Nf=None,
     w /= w.sum()
 
     # Validate and setup frequency grid
-    if df is None:
-        peak_width = 1. / (t.max() - t.min())
-        df = peak_width / freq_oversampling
-    if Nf is None:
-        avg_Nyquist = 0.5 * len(t) / (t.max() - t.min())
-        Nf = max(16, (nyquist_factor * avg_Nyquist - f0) / df)
-    Nf = int(Nf)
+    assert(f0 >= 0)
     assert(df > 0)
     assert(Nf > 0)
     freq = f0 + df * np.arange(Nf)
