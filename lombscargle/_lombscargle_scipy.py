@@ -9,7 +9,7 @@ except ImportError:
     HAS_SCIPY = False
 
 
-def lombscargle_scipy(t, y, freq, normalization='normalized',
+def lombscargle_scipy(t, y, freq, dy=1, normalization='normalized',
                       center_data=True):
     """Lomb Scargle Periodogram computed via scipy
 
@@ -21,6 +21,9 @@ def lombscargle_scipy(t, y, freq, normalization='normalized',
         sequence of observations
     freq : array_like
         frequencies (not angular frequencies) at which to calculate periodogram
+    dy : float or array_like (optional)
+        sequence of observational errors. Scipy algorithm supports constant
+        dy only.
     normalization : string (optional, default='normalized')
         Normalization to use for the periodogram
         TODO: figure out what options to use
@@ -30,6 +33,12 @@ def lombscargle_scipy(t, y, freq, normalization='normalized',
     """
     if not HAS_SCIPY:
         raise ValueError("scipy must be installed to use lombscargle_scipy")
+
+    if dy is not None:
+        dy = np.ravel(np.asarray(dy))
+        if dy.size != 1:
+            if not np.allclose(dy[0], dy):
+                raise ValueError("scipy method only supports constant errors")
 
     t, y = np.broadcast_arrays(t, y)
     freq = np.asarray(freq)

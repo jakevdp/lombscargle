@@ -140,7 +140,6 @@ def lombscargle(t, y, dy=None,
     PLS : array_like
         Lomb-Scargle power associated with each frequency omega
     """
-    dy_input = dy
     t, y, dy, frequency, unit_dict = _validate_units(t, y, dy, frequency,
                                                      strip_units=True)
     t, y, dy = np.broadcast_arrays(t, y, dy)
@@ -175,8 +174,7 @@ def lombscargle(t, y, dy=None,
                                           normalization=normalization)
     elif method == 'scipy':
         assert not fit_bias
-        assert dy_input is None
-        PLS = lombscargle_scipy(t, y, freq=frequency,
+        PLS = lombscargle_scipy(t, y, dy=dy, freq=frequency,
                                 center_data=center_data,
                                 normalization=normalization)
     else:

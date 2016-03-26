@@ -52,6 +52,7 @@ def test_output_shapes(method, shape, data):
 @pytest.mark.parametrize('y_unit', [units.mag, units.jansky])
 def test_units_match(method, t_unit, frequency_unit, y_unit, data):
     t, y, dy = data
+    dy = dy.mean()  # scipy only supports constant errors
 
     t = t * t_unit
     y = y * y_unit
@@ -62,16 +63,18 @@ def test_units_match(method, t_unit, frequency_unit, y_unit, data):
     assert frequency_out.unit == frequency_unit
     assert_equal(PLS.unit, units.dimensionless_unscaled)
 
-    if method != 'scipy':
-        # scipy does not accept dy
-        frequency_out, PLS = lombscargle(t, y, dy,
-                                         frequency=frequency,
-                                         method=method)
+    frequency_out, PLS = lombscargle(t, y, dy,
+                                     frequency=frequency,
+                                     fit_bias=False, method=method)
+    assert frequency_out.unit == frequency_unit
+    assert_equal(PLS.unit, units.dimensionless_unscaled)
 
 
 @pytest.mark.parametrize('method', METHOD_NAMES)
 def test_units_mismatch(method, data):
     t, y, dy = data
+    dy = dy.mean()  # scipy only supports constant errors
+
     t = t * units.second
     y = y * units.mag
     frequency = np.linspace(0.5, 1.5, 10)
@@ -79,15 +82,9 @@ def test_units_mismatch(method, data):
     # this should fail because frequency and 1/t unitsdo not match
     assert_raises(ValueError, lombscargle, t, y, frequency=frequency,
                   method=method, fit_bias=False)
-    if method != 'scipy':
-        # scipy does not accept dy
-        # this should fail because dy and y units do not match
-        assert_raises(ValueError, lombscargle, t, y, dy, frequency / t.unit,
-                      method=method, fit_bias=False)
-
-
-
-
+    # this should fail because dy and y units do not match
+    assert_raises(ValueError, lombscargle, t, y, dy, frequency / t.unit,
+                  method=method, fit_bias=False)
 
 
 @pytest.mark.parametrize('lombscargle_method', METHODS_NOBIAS)
