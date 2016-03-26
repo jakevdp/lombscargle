@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal
+from numpy.testing import assert_allclose, assert_equal, assert_raises
 from functools import partial
 
 from astropy import units
@@ -49,15 +49,45 @@ def test_output_shapes(method, shape, data):
 @pytest.mark.parametrize('method', METHOD_NAMES)
 @pytest.mark.parametrize('t_unit', [units.second, units.day])
 @pytest.mark.parametrize('frequency_unit', [units.Hz, 1. / units.second])
-def test_units_match(method, t_unit, frequency_unit, data):
+@pytest.mark.parametrize('y_unit', [units.mag, units.jansky])
+def test_units_match(method, t_unit, frequency_unit, y_unit, data):
     t, y, dy = data
 
     t = t * t_unit
+    y = y * y_unit
+    dy = dy * y_unit
     frequency = np.linspace(0.5, 1.5, 10) * frequency_unit
     frequency_out, PLS = lombscargle(t, y, frequency=frequency,
                                      fit_bias=False, method=method)
     assert frequency_out.unit == frequency_unit
     assert_equal(PLS.unit, units.dimensionless_unscaled)
+
+    if method != 'scipy':
+        # scipy does not accept dy
+        frequency_out, PLS = lombscargle(t, y, dy,
+                                         frequency=frequency,
+                                         method=method)
+
+
+@pytest.mark.parametrize('method', METHOD_NAMES)
+def test_units_mismatch(method, data):
+    t, y, dy = data
+    t = t * units.second
+    y = y * units.mag
+    frequency = np.linspace(0.5, 1.5, 10)
+
+    # this should fail because frequency and 1/t unitsdo not match
+    assert_raises(ValueError, lombscargle, t, y, frequency=frequency,
+                  method=method, fit_bias=False)
+    if method != 'scipy':
+        # scipy does not accept dy
+        # this should fail because dy and y units do not match
+        assert_raises(ValueError, lombscargle, t, y, dy, frequency / t.unit,
+                      method=method, fit_bias=False)
+
+
+
+
 
 
 @pytest.mark.parametrize('lombscargle_method', METHODS_NOBIAS)
