@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal, assert_raises
+from numpy.testing import assert_allclose, assert_equal
 from functools import partial
 
 from astropy import units
@@ -80,11 +80,16 @@ def test_units_mismatch(method, data):
     frequency = np.linspace(0.5, 1.5, 10)
 
     # this should fail because frequency and 1/t unitsdo not match
-    assert_raises(ValueError, lombscargle, t, y, frequency=frequency,
-                  method=method, fit_bias=False)
+    with pytest.raises(ValueError) as err:
+        lombscargle(t, y, frequency=frequency,
+                    method=method, fit_bias=False)
+    assert str(err.value).startswith('Units of frequency not equivalent')
+
     # this should fail because dy and y units do not match
-    assert_raises(ValueError, lombscargle, t, y, dy, frequency / t.unit,
-                  method=method, fit_bias=False)
+    with pytest.raises(ValueError) as err:
+        lombscargle(t, y, dy, frequency / t.unit,
+                    method=method, fit_bias=False)
+    assert str(err.value).startswith('Units of y not equivalent')
 
 
 @pytest.mark.parametrize('lombscargle_method', METHODS_NOBIAS)
