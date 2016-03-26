@@ -72,10 +72,6 @@ def test_units_match(method, t_unit, frequency_unit, y_unit, data):
 
 @pytest.mark.parametrize('method', METHOD_NAMES)
 def test_units_mismatch(method, data):
-    # These tests fail on Travis in Python 3.5 for some reason
-    import sys
-    if sys.version[:3] == '3.5':
-        return
     t, y, dy = data
     dy = dy.mean()  # scipy only supports constant errors
 
