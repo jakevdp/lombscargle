@@ -1,22 +1,15 @@
 import pytest
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
-from functools import partial
 
 from astropy import units
 
 from .. import lombscargle
-from ..implementations import (lombscargle_matrix, lombscargle_fast,
-                               lombscargle_slow, lombscargle_scipy)
+from ..implementations import lombscargle_slow
 
 from ..heuristics import baseline_heuristic
 
 METHOD_NAMES = ['auto', 'fast', 'slow', 'scipy', 'matrix']
-METHODS_NOTFAST = [lombscargle_slow, lombscargle_matrix, lombscargle_scipy]
-METHODS_NOBIAS = [partial(lombscargle_slow, fit_bias=False),
-                  partial(lombscargle_matrix, fit_bias=False),
-                  lombscargle_scipy]
-METHODS_BIAS = [lombscargle_slow, lombscargle_matrix]
 
 
 @pytest.fixture
@@ -88,42 +81,6 @@ def test_units_mismatch(method, data):
         lombscargle(t, y, dy, frequency / t.unit,
                     method=method, fit_bias=False)
     assert str(err.value).startswith('Units of y not equivalent')
-
-
-@pytest.mark.parametrize('lombscargle_method', METHODS_NOBIAS)
-@pytest.mark.parametrize('center_data', [True, False])
-@pytest.mark.parametrize('normalization', ['normalized', 'unnormalized'])
-def test_lombscargle_methods_common(lombscargle_method, center_data,
-                                    normalization, data):
-    t, y, dy = data
-    freq = 0.8 + 0.01 * np.arange(40)
-
-    kwds = dict(normalization=normalization, center_data=center_data)
-
-    expected_output = lombscargle_slow(t, y, dy=np.ones_like(t), freq=freq,
-                                       fit_bias=False, **kwds)
-
-    output = lombscargle_method(t, y, dy=None, freq=freq, **kwds)
-    assert_allclose(output, expected_output)
-
-
-@pytest.mark.parametrize('lombscargle_method', METHODS_BIAS)
-@pytest.mark.parametrize('center_data', [True, False])
-@pytest.mark.parametrize('fit_bias', [True, False])
-@pytest.mark.parametrize('normalization', ['normalized', 'unnormalized'])
-def test_lombscargle_methods_with_bias(lombscargle_method, center_data,
-                                       fit_bias, normalization, data):
-       t, y, freq = data
-       freq = 0.8 + 0.01 * np.arange(40)
-
-       kwds = dict(normalization=normalization, center_data=center_data,
-                   fit_bias=fit_bias)
-
-       expected_output = lombscargle_slow(t, y, dy=np.ones_like(t), freq=freq,
-                                          **kwds)
-
-       output = lombscargle_method(t, y, dy=None, freq=freq, **kwds)
-       assert_allclose(output, expected_output)
 
 
 @pytest.mark.parametrize('method', METHOD_NAMES)
