@@ -11,7 +11,11 @@ except ImportError:
 
 def lombscargle_scipy(t, y, freq, dy=1, normalization='normalized',
                       center_data=True):
-    """Lomb Scargle Periodogram computed via scipy
+    """Lomb-Scargle Periodogram
+
+    This is a wrapper of ``scipy.signal.lombscargle`` for computation of the
+    Lomb-Scargle periodogram. This is a relatively fast version of the naive
+    O[N^2] algorithm, but cannot handle heteroskedastic errors.
 
     Parameters
     ----------

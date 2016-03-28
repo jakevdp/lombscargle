@@ -7,8 +7,8 @@ def lombscargle_matrix(t, y, freq, dy=1, normalization='normalized',
                        fit_bias=True, center_data=True):
     """Lomb-Scargle Periodogram
 
-    This is a pure python matrix-based implementation which is relatively slow,
-    but useful for validating the faster algorithms in the package.
+    This implements a matrix-based periodogram, which is relatively slow but
+    useful for validating the faster algorithms in the package.
 
     Parameters
     ----------

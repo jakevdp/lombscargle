@@ -6,10 +6,8 @@ from functools import partial
 from astropy import units
 
 from .. import lombscargle
-from .._lombscargle_slow import lombscargle_slow
-from .._lombscargle_fast import lombscargle_fast
-from .._lombscargle_scipy import lombscargle_scipy
-from .._lombscargle_matrix import lombscargle_matrix
+from ..implementations import (lombscargle_matrix, lombscargle_fast,
+                               lombscargle_slow, lombscargle_scipy)
 
 from ..heuristics import baseline_heuristic
 

@@ -1,10 +1,8 @@
 import numpy as np
 
 from .heuristics import get_heuristic
-from ._lombscargle_slow import lombscargle_slow
-from ._lombscargle_fast import lombscargle_fast
-from ._lombscargle_scipy import lombscargle_scipy
-from ._lombscargle_matrix import lombscargle_matrix
+from .implementations import (lombscargle_matrix, lombscargle_fast,
+                              lombscargle_slow, lombscargle_scipy)
 
 from astropy import units
 

@@ -7,8 +7,7 @@ def lombscargle_slow(t, y, freq, dy=1, normalization='normalized',
                      fit_bias=True, center_data=True):
     """Lomb-Scargle Periodogram
 
-    This is a pure python implementation which is relatively slow, but useful
-    for validating the faster algorithms in the package.
+    This is a pure-python implemnetation of the original Lomb-Scargle formalism.
 
     Parameters
     ----------

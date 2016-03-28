@@ -10,9 +10,10 @@ def lombscargle_fast(t, y, dy, f0, df, Nf,
                      center_data=True, fit_bias=True,
                      normalization='normalized',
                      use_fft=True, trig_sum_kwds=None):
-    """Compute a lomb-scargle periodogram for the given data
-    This implements both an O[N^2] method if use_fft==False, or an
-    O[NlogN] method if use_fft==True.
+    """Fast Lomb-Scargle Periodogram
+
+    This implements the Press & Rybicki method [1]_ for fast O[N log(N)]
+    Lomb-Scargle periodograms.
 
     Parameters
     ----------

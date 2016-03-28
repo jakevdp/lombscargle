@@ -4,8 +4,7 @@ import pytest
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 
-from .._lombscargle_fast import lombscargle_fast
-from .._lombscargle_slow import lombscargle_slow
+from .. import lombscargle_slow, lombscargle_fast
 
 
 @pytest.fixture
