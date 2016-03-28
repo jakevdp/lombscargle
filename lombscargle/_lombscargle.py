@@ -107,12 +107,17 @@ def lombscargle(t, y, dy=None,
         use method='fast', frequencies must be regularly spaced.
     method : string (optional)
         specify the lomb scargle implementation to use. Options are:
+
         - 'auto': choose the best method based on the input
         - 'fast': use the O[N log N] fast method. Note that this requires
           evenly-spaced frequencies: by default this will be checked unless
           `assume_regular_frequency` is set to True.
-        - `slow`: use the O[N^2] pure python implementation
+        - `slow`: use the O[N^2] pure-python implementation
         - `matrix`: use the O[N^2] matrix/linear-fitting implementation
+        - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]
+          implementation written in C. Note that this does not support
+          heteroskedastic errors.
+
     assume_regular_frequency : bool (optional)
         if True, assume that the input frequency is of the form
         freq = f0 + df * np.arange(N). Only referenced if method is 'auto'
