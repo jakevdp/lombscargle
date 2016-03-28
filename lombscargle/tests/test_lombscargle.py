@@ -100,10 +100,10 @@ def test_lombscargle_methods_common(lombscargle_method, center_data,
 
     kwds = dict(normalization=normalization, center_data=center_data)
 
-    expected_output = lombscargle_slow(t, y, freq, dy=np.ones_like(t),
+    expected_output = lombscargle_slow(t, y, dy=np.ones_like(t), freq=freq,
                                        fit_bias=False, **kwds)
 
-    output = lombscargle_method(t, y, freq, **kwds)
+    output = lombscargle_method(t, y, dy=None, freq=freq, **kwds)
     assert_allclose(output, expected_output)
 
 
@@ -119,10 +119,10 @@ def test_lombscargle_methods_with_bias(lombscargle_method, center_data,
        kwds = dict(normalization=normalization, center_data=center_data,
                    fit_bias=fit_bias)
 
-       expected_output = lombscargle_slow(t, y, freq, dy=np.ones_like(t),
+       expected_output = lombscargle_slow(t, y, dy=np.ones_like(t), freq=freq,
                                           **kwds)
 
-       output = lombscargle_method(t, y, freq, **kwds)
+       output = lombscargle_method(t, y, dy=None, freq=freq, **kwds)
        assert_allclose(output, expected_output)
 
 
@@ -135,7 +135,7 @@ def test_common_interface(method, center_data, freq, data):
     if freq is None:
         freq = baseline_heuristic(len(t), t.max() - t.min())
 
-    expected_PLS = lombscargle_slow(t, y, freq=freq,
+    expected_PLS = lombscargle_slow(t, y, dy=None, freq=freq,
                                     fit_bias=False, center_data=center_data)
     frequency, PLS = lombscargle(t, y, frequency=freq, method=method,
                                  fit_bias=False, center_data=center_data)

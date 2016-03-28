@@ -3,7 +3,7 @@ from __future__ import print_function, division
 import numpy as np
 
 
-def lombscargle_slow(t, y, freq, dy=1, normalization='normalized',
+def lombscargle_slow(t, y, dy, freq, normalization='normalized',
                      fit_bias=True, center_data=True):
     """Lomb-Scargle Periodogram
 
@@ -11,14 +11,11 @@ def lombscargle_slow(t, y, freq, dy=1, normalization='normalized',
 
     Parameters
     ----------
-    t : array_like
-        sequence of times
-    y : array_like
-        sequence of observations
+    t, y, dy : array_like
+        times, values, and errors of the data points. These should be
+        broadcastable to the same shape.
     freq : array_like
         frequencies (not angular frequencies) at which to calculate periodogram
-    dy : float or array_like (optional)
-        sequence of observational errors
     normalization : string (optional, default='normalized')
         Normalization to use for the periodogram
         TODO: figure out what options to use
@@ -42,6 +39,9 @@ def lombscargle_slow(t, y, freq, dy=1, normalization='normalized',
     .. [2] W. Press et al, Numerical Recipies in C (2002)
     .. [3] Scargle, J.D. 1982, ApJ 263:835-853
     """
+    if dy is None:
+        dy = 1
+        
     t, y, dy = np.broadcast_arrays(t, y, dy)
     freq = np.asarray(freq)
     assert t.ndim == 1

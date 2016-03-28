@@ -19,8 +19,7 @@ def lombscargle_fast(t, y, dy, f0, df, Nf,
     ----------
     t, y, dy : array_like
         times, values, and errors of the data points. These should be
-        broadcastable to the same shape. If dy is not specified, a
-        constant error will be used.
+        broadcastable to the same shape.
     f0, df, Nf : (float, float, int)
         parameters describing the frequency grid, f = f0 + df * arange(Nf).
     center_data : bool (default=True)
@@ -53,6 +52,9 @@ def lombscargle_fast(t, y, dy, f0, df, Nf,
     .. [2] M. Zechmeister and M. Kurster, A&A 496, 577-584 (2009)
     .. [3] W. Press et al, Numerical Recipies in C (2002)
     """
+    if dy is None:
+        dy = 1
+
     # Validate and setup input data
     t, y, dy = np.broadcast_arrays(t, y, dy)
     assert t.ndim == 1
