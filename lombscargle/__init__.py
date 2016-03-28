@@ -6,6 +6,8 @@ lombscargle
 AstroPy-compatible implementation of the classic lomb-scargle periodogram.
 """
 
+__all__ = ['lombscargle']
+
 # Affiliated packages may add whatever they like to this file, but
 # should keep this content at the top.
 # ----------------------------------------------------------------------------
