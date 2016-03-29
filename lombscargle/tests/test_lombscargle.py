@@ -4,7 +4,7 @@ from numpy.testing import assert_allclose, assert_equal
 
 from astropy import units
 
-from .. import lombscargle
+from .. import lombscargle, LombScargle
 from ..implementations import lombscargle_slow
 
 from ..heuristics import baseline_heuristic
@@ -90,16 +90,56 @@ def test_common_interface(method, center_data, freq, data):
     t, y, dy = data
 
     if freq is None:
-        freq = baseline_heuristic(len(t), t.max() - t.min())
+        freq_expected = baseline_heuristic(len(t), t.max() - t.min())
+    else:
+        freq_expected = freq
 
-    expected_PLS = lombscargle_slow(t, y, dy=None, freq=freq,
+    expected_PLS = lombscargle_slow(t, y, dy=None, freq=freq_expected,
                                     fit_bias=False, center_data=center_data)
     frequency, PLS = lombscargle(t, y, frequency=freq, method=method,
                                  fit_bias=False, center_data=center_data)
-    assert_allclose(freq, frequency)
+    assert_allclose(freq_expected, frequency)
 
     if method in ['fast', 'auto']:
         atol = 0.005
     else:
         atol = 0
     assert_allclose(PLS, expected_PLS, atol=atol)
+
+
+@pytest.mark.parametrize('method', METHOD_NAMES)
+@pytest.mark.parametrize('center_data', [True, False])
+@pytest.mark.parametrize('fit_bias', [True, False])
+@pytest.mark.parametrize('freq', [0.8 + 0.01 * np.arange(40), None])
+def test_object_interface_power(data, method, center_data, fit_bias, freq):
+    t, y, dy = data
+    if method == 'scipy' and fit_bias:
+        return
+    if method == 'scipy':
+        dy = None
+    expected_freq, expected_PLS = lombscargle(t, y, dy,
+                                              frequency=freq,
+                                              method=method,
+                                              fit_bias=fit_bias,
+                                              center_data=center_data)
+    ls = LombScargle(t, y, dy, fit_bias=fit_bias, center_data=center_data)
+    freq, PLS = ls.power(freq, method=method)
+    assert_allclose(freq, expected_freq)
+    assert_allclose(PLS, expected_PLS)
+
+
+@pytest.mark.parametrize('fit_bias', [True, False])
+@pytest.mark.parametrize('freq', [1.0, 2.0])
+def test_object_interface_model(fit_bias, freq):
+    rand = np.random.RandomState(0)
+    t = 10 * rand.rand(40)
+    params = 10 * rand.rand(3)
+
+    y = np.zeros_like(t)
+    if fit_bias:
+        y += params[0]
+    y += params[1] * np.sin(2 * np.pi * freq * (t - params[2]))
+
+    ls = LombScargle(t, y, center_data=False, fit_bias=fit_bias)
+    y_fit = ls.model(t, freq)
+    assert_allclose(y_fit, y)

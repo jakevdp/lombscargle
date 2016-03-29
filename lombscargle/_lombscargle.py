@@ -3,6 +3,7 @@ import numpy as np
 from .heuristics import get_heuristic
 from .implementations import (lombscargle_matrix, lombscargle_fast,
                               lombscargle_slow, lombscargle_scipy)
+from .implementations.mle import periodic_fit
 
 from astropy import units
 
@@ -49,7 +50,9 @@ def _validate_units(t, y, dy=None, frequency=None, strip_units=True):
     """
     t = units.Quantity(t)
     y = units.Quantity(y)
-    frequency = units.Quantity(frequency)
+
+    if frequency is not None:
+        frequency = units.Quantity(frequency)
 
     if dy is None:
         dy = 1 * y.unit
@@ -159,10 +162,11 @@ def lombscargle(t, y, dy=None,
     if frequency is None:
         # TODO: offer means of passing optional params
         heuristic = get_heuristic(frequency_heuristic)
-        f0, df, Nf = heuristic(n_samples=len(t),
-                               baseline=t.max() - t.min(),
-                               return_tuple=True)
-        frequency = f0 + df * np.arange(Nf)
+        frequency = heuristic(n_samples=len(t),
+                              baseline=t.max() - t.min())
+        f0 = frequency[0]
+        df = frequency[1] - frequency[0]
+        Nf = len(frequency)
         input_shape = (Nf,)
     elif method == 'fast':
         f0, df, Nf = _get_frequency_grid(frequency, assume_regular_frequency)
@@ -192,3 +196,54 @@ def lombscargle(t, y, dy=None,
                            unit_dict['frequency']),
             units.Quantity(PLS.reshape(input_shape),
                            units.dimensionless_unscaled))
+
+
+class LombScargle(object):
+    """Object wrapper for Lomb-Scargle functionality
+
+    Parameters
+    ----------
+    t : array_like or Quantity
+        sequence of observation times
+    y : array_like or Quantity
+        sequence of observations associated with times t
+    dy : float, array_like or Quantity (optional)
+        error or sequence of observational errors associated with times t
+    fit_bias : bool (optional, default=True)
+        if True, include a constant offet as part of the model at each
+        frequency. This can lead to more accurate results, especially in then
+        case of incomplete phase coverage.
+    center_data : bool (optional, default=True)
+        if True, pre-center the data by subtracting the weighted mean
+        of the input data. This is especially important if `fit_bias = False`
+
+    Methods
+    -------
+    power : compute the lomb-scargle power for the input data
+    model : compute the Lomb-Scargle periodic model for new input times
+    """
+    def __init__(self, t, y, dy=None, fit_bias=True, center_data=True):
+        self.t = t
+        self.y = y
+        self.dy = dy
+        self.fit_bias = fit_bias
+        self.center_data = center_data
+
+    def power(self, frequency=None, normalization='normalized', method='auto',
+              assume_regular_frequency=False, frequency_heuristic='baseline'):
+        """Compute the Lomb-Scargle power at the given frequencies"""
+        return lombscargle(self.t, self.y, self.dy,
+                           frequency=frequency,
+                           center_data=self.center_data,
+                           fit_bias=self.fit_bias,
+                           normalization=normalization,
+                           method=method,
+                           assume_regular_frequency=assume_regular_frequency,
+                           frequency_heuristic=frequency_heuristic)
+
+    def model(self, t, frequency):
+        """Compute the Lomb-Scargle model at the given frequency"""
+        return periodic_fit(self.t, self.y, self.dy,
+                            frequency=frequency, t_fit=t,
+                            center_data=self.center_data,
+                            fit_bias=self.fit_bias)
