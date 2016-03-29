@@ -33,8 +33,8 @@ def design_matrix(t, frequency, dy=None, bias=True, nterms=1):
     return np.transpose(XT)
 
 
-def periodic_fit(self, t, y, dy, frequency, t_fit,
-                 center_data=True, fit_bias=True):
+def periodic_fit(t, y, dy, frequency, t_fit,
+                 center_data=True, fit_bias=True, nterms=1):
     """Compute the Lomb-Scargle model fit at a given frequency
 
     Parameters
@@ -63,8 +63,8 @@ def periodic_fit(self, t, y, dy, frequency, t_fit,
         yw = y / dy
     chi2_ref = np.dot(yw, yw)
 
-    X = design_matrix(t, frequency, dy=dy, bias=fit_bias)
-    X_fit = design_matrix(t_fit, frequency, bias=fit_bias)
+    X = design_matrix(t, frequency, dy=dy, bias=fit_bias, nterms=nterms)
+    X_fit = design_matrix(t_fit, frequency, bias=fit_bias, nterms=nterms)
 
     theta_MLE = np.linalg.solve(np.dot(X.T, X),
                                 np.dot(X.T, yw))
