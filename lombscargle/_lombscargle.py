@@ -216,13 +216,9 @@ class LombScargle(object):
     center_data : bool (optional, default=True)
         if True, pre-center the data by subtracting the weighted mean
         of the input data. This is especially important if `fit_bias = False`
-
-    Methods
-    -------
-    power : compute the lomb-scargle power for the input data
-    model : compute the Lomb-Scargle periodic model for new input times
     """
     def __init__(self, t, y, dy=None, fit_bias=True, center_data=True):
+        # TODO: validate units here
         self.t = t
         self.y = y
         self.dy = dy
@@ -231,7 +227,52 @@ class LombScargle(object):
 
     def power(self, frequency=None, normalization='normalized', method='auto',
               assume_regular_frequency=False, frequency_heuristic='baseline'):
-        """Compute the Lomb-Scargle power at the given frequencies"""
+        """Compute the Lomb-Scargle power at the given frequencies
+
+        Parameters
+        ----------
+        frequency : array_like or Quantity (optional)
+            frequencies (not angular frequencies) at which to evaluate the
+            periodogram. If not specified, optimal frequencies will be chosen using
+            a heuristic which will attempt to provide sufficient frequency range
+            and sampling so that peaks will not be missed. Note that in order to
+            use method='fast', frequencies must be regularly spaced.
+        method : string (optional)
+            specify the lomb scargle implementation to use. Options are:
+
+            - 'auto': choose the best method based on the input
+            - 'fast': use the O[N log N] fast method. Note that this requires
+              evenly-spaced frequencies: by default this will be checked unless
+              `assume_regular_frequency` is set to True.
+            - `slow`: use the O[N^2] pure-python implementation
+            - `matrix`: use the O[N^2] matrix/linear-fitting implementation
+            - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]
+              implementation written in C. Note that this does not support
+              heteroskedastic errors.
+
+        assume_regular_frequency : bool (optional)
+            if True, assume that the input frequency is of the form
+            freq = f0 + df * np.arange(N). Only referenced if method is 'auto'
+            or 'fast'.
+        normalization : string (optional, default='normalized')
+            Normalization to use for the periodogram. Options are 'normalized' or
+            'unnormalized'.
+        fit_bias : bool (optional, default=True)
+            if True, include a constant offet as part of the model at each
+            frequency. This can lead to more accurate results, especially in then
+            case of incomplete phase coverage.
+        center_data : bool (optional, default=True)
+            if True, pre-center the data by subtracting the weighted mean
+            of the input data. This is especially important if `fit_bias = False`
+        frequency_heuristic : string (optional, default='baseline')
+            the frequency heuristic to use. By default, it is assumed that the
+            observation baseline will drive the peak width.
+
+        Returns
+        -------
+        frequency, power : ndarrays
+            The frequency and Lomb-Scargle power
+        """
         return lombscargle(self.t, self.y, self.dy,
                            frequency=frequency,
                            center_data=self.center_data,
@@ -242,7 +283,21 @@ class LombScargle(object):
                            frequency_heuristic=frequency_heuristic)
 
     def model(self, t, frequency):
-        """Compute the Lomb-Scargle model at the given frequency"""
+        """Compute the Lomb-Scargle model at the given frequency
+
+        Parameters
+        ----------
+        t : array_like, length n_samples
+            times at which to compute the model
+        frequency : float
+            the frequency for the model
+
+        Returns
+        -------
+        y : np.ndarray, length n_samples
+            The model fit corresponding to the input times
+        """
+        # TODO: handle units correctly
         return periodic_fit(self.t, self.y, self.dy,
                             frequency=frequency, t_fit=t,
                             center_data=self.center_data,
