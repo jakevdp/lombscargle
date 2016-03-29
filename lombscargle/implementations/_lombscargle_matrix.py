@@ -2,6 +2,8 @@ from __future__ import print_function, division
 
 import numpy as np
 
+from .mle import design_matrix
+
 
 def lombscargle_matrix(t, y, dy, freq, normalization='normalized',
                        fit_bias=True, center_data=True):
@@ -36,7 +38,7 @@ def lombscargle_matrix(t, y, dy, freq, normalization='normalized',
     """
     if dy is None:
         dy = 1
-        
+
     t, y, dy = np.broadcast_arrays(t, y, dy)
     freq = np.asarray(freq)
     assert t.ndim == 1
@@ -52,12 +54,9 @@ def lombscargle_matrix(t, y, dy, freq, normalization='normalized',
         yw = y / dy
     chi2_ref = np.dot(yw, yw)
 
-    # compute the model chi2 at each frequency
+    # compute the unnormalized model chi2 at each frequency
     def compute_power(f):
-        cols = [np.ones_like(t)] if fit_bias else []
-        cols.append(np.sin(2 * np.pi * f * t))
-        cols.append(np.cos(2 * np.pi * f * t))
-        X = np.transpose(np.vstack(cols) / dy)
+        X = design_matrix(t, f, dy=dy, bias=fit_bias)
         XTX = np.dot(X.T, X)
         XTy = np.dot(X.T, yw)
         return np.dot(XTy.T, np.linalg.solve(XTX, XTy))
