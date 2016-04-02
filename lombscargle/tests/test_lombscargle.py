@@ -85,7 +85,7 @@ def test_units_mismatch(method, data):
 
 @pytest.mark.parametrize('method', METHOD_NAMES)
 @pytest.mark.parametrize('center_data', [True, False])
-@pytest.mark.parametrize('freq', [0.8 + 0.01 * np.arange(40), None])
+@pytest.mark.parametrize('freq', [0.8 + 0.01 * np.arange(40)])
 def test_common_interface(method, center_data, freq, data):
     t, y, dy = data
 
@@ -110,20 +110,38 @@ def test_common_interface(method, center_data, freq, data):
 @pytest.mark.parametrize('method', METHOD_NAMES)
 @pytest.mark.parametrize('center_data', [True, False])
 @pytest.mark.parametrize('fit_bias', [True, False])
-@pytest.mark.parametrize('freq', [0.8 + 0.01 * np.arange(40), None])
+@pytest.mark.parametrize('freq', [0.8 + 0.01 * np.arange(40)])
 def test_object_interface_power(data, method, center_data, fit_bias, freq):
     t, y, dy = data
     if method == 'scipy' and fit_bias:
         return
     if method == 'scipy':
         dy = None
+    freq, expected_PLS = lombscargle(t, y, dy,
+                                     frequency=freq,
+                                     method=method,
+                                     fit_bias=fit_bias,
+                                     center_data=center_data)
+    ls = LombScargle(t, y, dy, fit_bias=fit_bias, center_data=center_data)
+    PLS = ls.power(freq, method=method)
+    assert_allclose(PLS, expected_PLS)
+
+
+@pytest.mark.parametrize('method', METHOD_NAMES)
+@pytest.mark.parametrize('center_data', [True, False])
+@pytest.mark.parametrize('fit_bias', [True, False])
+def test_object_interface_autopower(data, method, center_data, fit_bias):
+    t, y, dy = data
+    if method == 'scipy' and fit_bias:
+        return
+    if method == 'scipy':
+        dy = None
     expected_freq, expected_PLS = lombscargle(t, y, dy,
-                                              frequency=freq,
                                               method=method,
                                               fit_bias=fit_bias,
                                               center_data=center_data)
     ls = LombScargle(t, y, dy, fit_bias=fit_bias, center_data=center_data)
-    freq, PLS = ls.power(freq, method=method)
+    freq, PLS = ls.autopower(method=method)
     assert_allclose(freq, expected_freq)
     assert_allclose(PLS, expected_PLS)
 
@@ -143,3 +161,12 @@ def test_object_interface_model(fit_bias, freq):
     ls = LombScargle(t, y, center_data=False, fit_bias=fit_bias)
     y_fit = ls.model(t, freq)
     assert_allclose(y_fit, y)
+
+
+def test_object_interface_bad_input(data):
+    t, y, dy = data
+    ls = LombScargle(t, y, dy)
+    # this should fail because frequency and 1/t unitsdo not match
+    with pytest.raises(ValueError) as err:
+        ls.power(frequency=None)
+    assert str(err.value).startswith('Must supply a valid frequency')

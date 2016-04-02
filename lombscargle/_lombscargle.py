@@ -90,7 +90,8 @@ def lombscargle(t, y, dy=None,
                 assume_regular_frequency=False,
                 normalization='normalized',
                 fit_bias=True, center_data=True,
-                frequency_heuristic='baseline'):
+                frequency_heuristic='baseline',
+                heuristic_kwds=None, method_kwds=None):
     """
     Lomb-scargle Periodogram
 
@@ -138,6 +139,10 @@ def lombscargle(t, y, dy=None,
     frequency_heuristic : string (optional, default='baseline')
         the frequency heuristic to use. By default, it is assumed that the
         observation baseline will drive the peak width.
+    heuristic_kwds : dict (optional)
+        additional keywords to pass to the frequency heuristic
+    method_kwds : dict (optional)
+        additional keywords to pass to the lomb-scargle method
 
     Returns
     -------
@@ -163,7 +168,8 @@ def lombscargle(t, y, dy=None,
         # TODO: offer means of passing optional params
         heuristic = get_heuristic(frequency_heuristic)
         frequency = heuristic(n_samples=len(t),
-                              baseline=t.max() - t.min())
+                              baseline=t.max() - t.min(),
+                              **(heuristic_kwds or {}))
         f0 = frequency[0]
         df = frequency[1] - frequency[0]
         Nf = len(frequency)
@@ -178,19 +184,22 @@ def lombscargle(t, y, dy=None,
         frequency, PLS = lombscargle_fast(t, y, dy=dy, f0=f0, df=df, Nf=Nf,
                                           center_data=center_data,
                                           fit_bias=fit_bias,
-                                          normalization=normalization)
+                                          normalization=normalization,
+                                          **(method_kwds or {}))
     elif method == 'scipy':
         assert not fit_bias
         PLS = lombscargle_scipy(t, y, dy=dy, freq=frequency,
                                 center_data=center_data,
-                                normalization=normalization)
+                                normalization=normalization,
+                                **(method_kwds or {}))
     else:
         if dy is None:
             dy = 1
         PLS = METHODS[method](t, y, dy=dy, freq=frequency,
                               center_data=center_data,
                               fit_bias=fit_bias,
-                              normalization=normalization)
+                              normalization=normalization,
+                              **(method_kwds or {}))
 
     return (units.Quantity(frequency.reshape(input_shape),
                            unit_dict['frequency']),
@@ -225,18 +234,68 @@ class LombScargle(object):
         self.fit_bias = fit_bias
         self.center_data = center_data
 
-    def power(self, frequency=None, normalization='normalized', method='auto',
-              assume_regular_frequency=False, frequency_heuristic='baseline'):
+    def autopower(self, normalization='normalized', method='auto',
+                  method_kwds=None, frequency_heuristic='baseline', **kwargs):
         """Compute the Lomb-Scargle power at the given frequencies
 
         Parameters
         ----------
-        frequency : array_like or Quantity (optional)
+        frequency_heuristic : string (optional, default='baseline')
+            the frequency heuristic to use. By default, it is assumed that the
+            observation baseline will drive the peak width.
+        method : string (optional)
+            specify the lomb scargle implementation to use. Options are:
+
+            - 'auto': choose the best method based on the input
+            - 'fast': use the O[N log N] fast method. Note that this requires
+              evenly-spaced frequencies: by default this will be checked unless
+              `assume_regular_frequency` is set to True.
+            - `slow`: use the O[N^2] pure-python implementation
+            - `matrix`: use the O[N^2] matrix/linear-fitting implementation
+            - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]
+              implementation written in C. Note that this does not support
+              heteroskedastic errors.
+
+        method_kwds : dict (optional)
+            additional keywords to pass to the lomb-scargle method
+        normalization : string (optional, default='normalized')
+            Normalization to use for the periodogram. Options are 'normalized' or
+            'unnormalized'.
+        fit_bias : bool (optional, default=True)
+            if True, include a constant offet as part of the model at each
+            frequency. This can lead to more accurate results, especially in then
+            case of incomplete phase coverage.
+        center_data : bool (optional, default=True)
+            if True, pre-center the data by subtracting the weighted mean
+            of the input data. This is especially important if `fit_bias = False`
+        **kwargs :
+            additional keyword arguments will be passed to the frequency
+            heuristic.
+
+        Returns
+        -------
+        frequency, power : ndarrays
+            The frequency and Lomb-Scargle power
+        """
+        return lombscargle(self.t, self.y, self.dy,
+                           frequency=None,
+                           frequency_heuristic=frequency_heuristic,
+                           heuristic_kwds=kwargs,
+                           center_data=self.center_data,
+                           fit_bias=self.fit_bias,
+                           normalization=normalization,
+                           method=method, method_kwds=method_kwds)
+
+    def power(self, frequency, normalization='normalized', method='auto',
+              assume_regular_frequency=False, method_kwds=None):
+        """Compute the Lomb-Scargle power at the given frequencies
+
+        Parameters
+        ----------
+        frequency : array_like or Quantity
             frequencies (not angular frequencies) at which to evaluate the
-            periodogram. If not specified, optimal frequencies will be chosen using
-            a heuristic which will attempt to provide sufficient frequency range
-            and sampling so that peaks will not be missed. Note that in order to
-            use method='fast', frequencies must be regularly spaced.
+            periodogram. Note that in order to use method='fast', frequencies
+            must be regularly-spaced.
         method : string (optional)
             specify the lomb scargle implementation to use. Options are:
 
@@ -255,32 +314,35 @@ class LombScargle(object):
             freq = f0 + df * np.arange(N). Only referenced if method is 'auto'
             or 'fast'.
         normalization : string (optional, default='normalized')
-            Normalization to use for the periodogram. Options are 'normalized' or
-            'unnormalized'.
+            Normalization to use for the periodogram. Options are 'normalized'
+            or 'unnormalized'.
         fit_bias : bool (optional, default=True)
             if True, include a constant offet as part of the model at each
-            frequency. This can lead to more accurate results, especially in then
-            case of incomplete phase coverage.
+            frequency. This can lead to more accurate results, especially in
+            the case of incomplete phase coverage.
         center_data : bool (optional, default=True)
             if True, pre-center the data by subtracting the weighted mean
             of the input data. This is especially important if `fit_bias = False`
-        frequency_heuristic : string (optional, default='baseline')
-            the frequency heuristic to use. By default, it is assumed that the
-            observation baseline will drive the peak width.
+        method_kwds : dict (optional)
+            additional keywords to pass to the lomb-scargle method
 
         Returns
         -------
-        frequency, power : ndarrays
-            The frequency and Lomb-Scargle power
+        power : ndarray
+            The Lomb-Scargle power at the specified frequency
         """
-        return lombscargle(self.t, self.y, self.dy,
-                           frequency=frequency,
-                           center_data=self.center_data,
-                           fit_bias=self.fit_bias,
-                           normalization=normalization,
-                           method=method,
-                           assume_regular_frequency=assume_regular_frequency,
-                           frequency_heuristic=frequency_heuristic)
+        if frequency is None:
+            raise ValueError("Must supply a valid frequency. If you would like "
+                             "an automatic frequency grid, use the autopower() "
+                             "method.")
+        f, PLS = lombscargle(self.t, self.y, self.dy,
+                             frequency=frequency,
+                             center_data=self.center_data,
+                             fit_bias=self.fit_bias,
+                             normalization=normalization,
+                             method=method, method_kwds=method_kwds,
+                             assume_regular_frequency=assume_regular_frequency)
+        return PLS
 
     def model(self, t, frequency):
         """Compute the Lomb-Scargle model at the given frequency
