@@ -3,7 +3,7 @@ from __future__ import print_function, division
 import numpy as np
 
 
-def lombscargle_slow(t, y, dy, freq, normalization='normalized',
+def lombscargle_slow(t, y, dy, frequency, normalization='normalized',
                      fit_bias=True, center_data=True):
     """Lomb-Scargle Periodogram
 
@@ -14,7 +14,7 @@ def lombscargle_slow(t, y, dy, freq, normalization='normalized',
     t, y, dy : array_like
         times, values, and errors of the data points. These should be
         broadcastable to the same shape.
-    freq : array_like
+    frequency : array_like
         frequencies (not angular frequencies) at which to calculate periodogram
     normalization : string (optional, default='normalized')
         Normalization to use for the periodogram
@@ -41,11 +41,11 @@ def lombscargle_slow(t, y, dy, freq, normalization='normalized',
     """
     if dy is None:
         dy = 1
-        
+
     t, y, dy = np.broadcast_arrays(t, y, dy)
-    freq = np.asarray(freq)
+    frequency = np.asarray(frequency)
     assert t.ndim == 1
-    assert freq.ndim == 1
+    assert frequency.ndim == 1
 
     w = dy ** -2.0
     w /= w.sum()
@@ -54,7 +54,7 @@ def lombscargle_slow(t, y, dy, freq, normalization='normalized',
     if fit_bias or center_data:
         y = y - np.dot(w, y)
 
-    omega = 2 * np.pi * freq
+    omega = 2 * np.pi * frequency
     omega = omega.ravel()[np.newaxis, :]
 
     # make following arrays into column vectors

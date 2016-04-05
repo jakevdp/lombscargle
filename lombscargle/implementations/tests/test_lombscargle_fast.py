@@ -34,7 +34,7 @@ def test_lombscargle_fast(center_data, fit_bias, normalization, data):
                                  f0=f0, df=df, Nf=N, **kwds)
     freq2, P2 = lombscargle_fast(t, y, dy, use_fft=False,
                                  f0=f0, df=df, Nf=N, **kwds)
-    P3 = lombscargle_slow(t, y, dy=dy, freq=freq1, **kwds)
+    P3 = lombscargle_slow(t, y, dy=dy, frequency=freq1, **kwds)
 
     Pmax = P1.max()
 

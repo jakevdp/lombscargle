@@ -5,7 +5,7 @@ import numpy as np
 from .mle import design_matrix
 
 
-def lombscargle_matrix(t, y, dy, freq, normalization='normalized',
+def lombscargle_matrix(t, y, dy, frequency, normalization='normalized',
                        fit_bias=True, center_data=True):
     """Lomb-Scargle Periodogram
 
@@ -17,7 +17,7 @@ def lombscargle_matrix(t, y, dy, freq, normalization='normalized',
     t, y, dy : array_like
         times, values, and errors of the data points. These should be
         broadcastable to the same shape.
-    freq : array_like
+    frequency : array_like
         frequencies (not angular frequencies) at which to calculate periodogram
     normalization : string (optional, default='normalized')
         Normalization to use for the periodogram
@@ -40,9 +40,9 @@ def lombscargle_matrix(t, y, dy, freq, normalization='normalized',
         dy = 1
 
     t, y, dy = np.broadcast_arrays(t, y, dy)
-    freq = np.asarray(freq)
+    frequency = np.asarray(frequency)
     assert t.ndim == 1
-    assert freq.ndim == 1
+    assert frequency.ndim == 1
 
     w = dy ** -2.0
     w /= w.sum()
@@ -61,7 +61,7 @@ def lombscargle_matrix(t, y, dy, freq, normalization='normalized',
         XTy = np.dot(X.T, yw)
         return np.dot(XTy.T, np.linalg.solve(XTX, XTy))
 
-    p = np.array([compute_power(f) for f in freq])
+    p = np.array([compute_power(f) for f in frequency])
 
     if normalization == 'unnormalized':
         p *= 0.5

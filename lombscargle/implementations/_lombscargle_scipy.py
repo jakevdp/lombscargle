@@ -9,7 +9,7 @@ except ImportError:
     HAS_SCIPY = False
 
 
-def lombscargle_scipy(t, y, dy, freq, normalization='normalized',
+def lombscargle_scipy(t, y, dy, frequency, normalization='normalized',
                       center_data=True):
     """Lomb-Scargle Periodogram
 
@@ -22,7 +22,7 @@ def lombscargle_scipy(t, y, dy, freq, normalization='normalized',
     t, y, dy : array_like
         times, values, and errors of the data points. These should be
         broadcastable to the same shape.
-    freq : array_like
+    frequency : array_like
         frequencies (not angular frequencies) at which to calculate periodogram
     normalization : string (optional, default='normalized')
         Normalization to use for the periodogram
@@ -41,15 +41,15 @@ def lombscargle_scipy(t, y, dy, freq, normalization='normalized',
                 raise ValueError("scipy method only supports constant errors")
 
     t, y = np.broadcast_arrays(t, y)
-    freq = np.asarray(freq)
+    frequency = np.asarray(frequency)
     assert t.ndim == 1
-    assert freq.ndim == 1
+    assert frequency.ndim == 1
 
     if center_data:
         y = y - y.mean()
 
     # Note: scipy input accepts angular frequencies
-    p = signal.lombscargle(t, y, 2 * np.pi * freq)
+    p = signal.lombscargle(t, y, 2 * np.pi * frequency)
 
     if normalization == 'unnormalized':
         pass

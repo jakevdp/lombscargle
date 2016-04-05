@@ -94,7 +94,7 @@ def test_common_interface(method, center_data, freq, data):
     else:
         freq_expected = freq
 
-    expected_PLS = lombscargle_slow(t, y, dy=None, freq=freq_expected,
+    expected_PLS = lombscargle_slow(t, y, dy=None, frequency=freq_expected,
                                     fit_bias=False, center_data=center_data)
     frequency, PLS = lombscargle(t, y, frequency=freq, method=method,
                                  fit_bias=False, center_data=center_data)
@@ -136,13 +136,16 @@ def test_object_interface_autopower(data, method, center_data, fit_bias):
         return
     if method == 'scipy':
         dy = None
-    expected_freq, expected_PLS = lombscargle(t, y, dy,
-                                              method=method,
-                                              fit_bias=fit_bias,
-                                              center_data=center_data)
+
     ls = LombScargle(t, y, dy, fit_bias=fit_bias, center_data=center_data)
     freq, PLS = ls.autopower(method=method)
-    assert_allclose(freq, expected_freq)
+
+    _, expected_PLS = lombscargle(t, y, dy, freq,
+                                  method=method,
+                                  fit_bias=fit_bias,
+                                  center_data=center_data)
+
+    # TODO: test frequency output?
     assert_allclose(PLS, expected_PLS)
 
 
