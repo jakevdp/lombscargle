@@ -63,7 +63,6 @@ def lombscargle_fast(t, y, dy, f0, df, Nf,
     assert(f0 >= 0)
     assert(df > 0)
     assert(Nf > 0)
-    frequency = f0 + df * np.arange(Nf)
 
     w = dy ** -2.0
     w /= w.sum()
@@ -137,4 +136,4 @@ def lombscargle_fast(t, y, dy, f0, df, Nf,
         raise ValueError("normalization='{0}' "
                          "not recognized".format(normalization))
 
-    return frequency, power
+    return power

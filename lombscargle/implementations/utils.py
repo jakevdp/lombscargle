@@ -5,7 +5,7 @@ import numpy as np
 try:
     from scipy import special as scipy_special
 except ImportError:
-    special = None
+    scipy_special = None
 
 
 # Precomputed factorials

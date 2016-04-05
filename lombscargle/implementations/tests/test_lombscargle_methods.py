@@ -3,11 +3,9 @@ import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 from functools import partial
 
-from .. import (lombscargle_matrix, lombscargle_fast,
-                lombscargle_slow, lombscargle_scipy)
+from .. import lombscargle_matrix, lombscargle_slow, lombscargle_scipy
 
 
-METHODS_NOTFAST = [lombscargle_slow, lombscargle_matrix, lombscargle_scipy]
 METHODS_NOBIAS = [partial(lombscargle_slow, fit_bias=False),
                   partial(lombscargle_matrix, fit_bias=False),
                   lombscargle_scipy]

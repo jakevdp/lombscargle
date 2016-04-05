@@ -5,13 +5,26 @@ import numpy as np
 def design_matrix(t, frequency, dy=None, bias=True, nterms=1):
     """Compute the Lomb-Scargle design matrix at the given frequency
 
+    This is the matrix X such that the periodic model at the given frequency
+    can be expressed :math:`\\hat{y} = X \\theta`.
+
     Parameters
     ----------
-    TODO
+    t : array_like, shape=(n_times,)
+        times at which to compute the design matrix
+    frequency : float
+        frequency for the design matrix
+    dy : float or array_like (optional)
+        data uncertainties: should be broadcastable with `t`
+    bias : bool (default=True)
+        If true, include a bias column in the matrix
+    nterms : int (default=1)
+        Number of Fourier terms to include in the model
 
     Returns
     -------
-    TODO
+    X : ndarray, shape=(n_times, n_parameters)
+        The design matrix, where n_parameters = bool(bias) + 2 * nterms
     """
     t = np.asarray(t)
     assert t.ndim == 1
@@ -39,11 +52,23 @@ def periodic_fit(t, y, dy, frequency, t_fit,
 
     Parameters
     ----------
-    TODO
+    t, y, dy : float or array_like
+        The times, observations, and uncertainties to fit
+    frequency : float
+        The frequency at which to compute the model
+    t_fit : float or array_like
+        The times at which the fit should be computed
+    center_data : bool (default=True)
+        If True, center the input data before applying the fit
+    fit_bias : bool (default=True)
+        If True, include the bias as part of the model
+    nterms : int (default=1)
+        The number of Fourier terms to include in the fit
 
     Returns
     -------
-    TODO
+    y_fit : ndarray
+        The model fit evaluated at each value of t_fit
     """
     if dy is None:
         dy = 1
@@ -64,9 +89,9 @@ def periodic_fit(t, y, dy, frequency, t_fit,
     chi2_ref = np.dot(yw, yw)
 
     X = design_matrix(t, frequency, dy=dy, bias=fit_bias, nterms=nterms)
-    X_fit = design_matrix(t_fit, frequency, bias=fit_bias, nterms=nterms)
-
     theta_MLE = np.linalg.solve(np.dot(X.T, X),
                                 np.dot(X.T, yw))
+
+    X_fit = design_matrix(t_fit, frequency, bias=fit_bias, nterms=nterms)
 
     return np.dot(X_fit, theta_MLE)

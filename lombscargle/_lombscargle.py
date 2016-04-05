@@ -140,7 +140,7 @@ def lombscargle(t, y, dy=None,
 
     Returns
     -------
-    freq : array_like
+    frequency : array_like
         Frequencies at which the Lomb-Scargle power is computed
     PLS : array_like
         Lomb-Scargle power associated with each frequency omega
@@ -166,11 +166,11 @@ def lombscargle(t, y, dy=None,
         if dy is None:
             dy = 1
         f0, df, Nf = _get_frequency_grid(frequency, assume_regular_frequency)
-        frequency, PLS = lombscargle_fast(t, y, dy=dy, f0=f0, df=df, Nf=Nf,
-                                          center_data=center_data,
-                                          fit_bias=fit_bias,
-                                          normalization=normalization,
-                                          **(method_kwds or {}))
+        PLS = lombscargle_fast(t, y, dy=dy, f0=f0, df=df, Nf=Nf,
+                               center_data=center_data,
+                               fit_bias=fit_bias,
+                               normalization=normalization,
+                               **(method_kwds or {}))
     elif method == 'scipy':
         assert not fit_bias
         PLS = lombscargle_scipy(t, y, dy=dy, frequency=frequency,
@@ -186,8 +186,7 @@ def lombscargle(t, y, dy=None,
                               normalization=normalization,
                               **(method_kwds or {}))
 
-    return (frequency.reshape(input_shape) * unit_dict['frequency'],
-            PLS.reshape(input_shape) * units.dimensionless_unscaled)
+    return PLS.reshape(input_shape) * units.dimensionless_unscaled
 
 
 class LombScargle(object):
@@ -258,13 +257,14 @@ class LombScargle(object):
         frequency = heuristic(n_samples=len(self.t),
                               baseline=self.t.max() - self.t.min(),
                               **kwargs)
-        return lombscargle(self.t, self.y, self.dy,
-                           frequency=frequency,
-                           center_data=self.center_data,
-                           fit_bias=self.fit_bias,
-                           normalization=normalization,
-                           method=method, method_kwds=method_kwds,
-                           assume_regular_frequency=True)
+        power = lombscargle(self.t, self.y, self.dy,
+                            frequency=frequency,
+                            center_data=self.center_data,
+                            fit_bias=self.fit_bias,
+                            normalization=normalization,
+                            method=method, method_kwds=method_kwds,
+                            assume_regular_frequency=True)
+        return frequency, power
 
     def power(self, frequency, normalization='normalized', method='auto',
               assume_regular_frequency=False, method_kwds=None):
@@ -315,14 +315,13 @@ class LombScargle(object):
             raise ValueError("Must supply a valid frequency. If you would like "
                              "an automatic frequency grid, use the autopower() "
                              "method.")
-        f, PLS = lombscargle(self.t, self.y, self.dy,
-                             frequency=frequency,
-                             center_data=self.center_data,
-                             fit_bias=self.fit_bias,
-                             normalization=normalization,
-                             method=method, method_kwds=method_kwds,
-                             assume_regular_frequency=assume_regular_frequency)
-        return PLS
+        return lombscargle(self.t, self.y, self.dy,
+                           frequency=frequency,
+                           center_data=self.center_data,
+                           fit_bias=self.fit_bias,
+                           normalization=normalization,
+                           method=method, method_kwds=method_kwds,
+                           assume_regular_frequency=assume_regular_frequency)
 
     def model(self, t, frequency):
         """Compute the Lomb-Scargle model at the given frequency
