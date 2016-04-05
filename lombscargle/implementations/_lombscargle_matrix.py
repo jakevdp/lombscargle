@@ -33,8 +33,14 @@ def lombscargle_matrix(t, y, dy, frequency, normalization='normalized',
     Returns
     -------
     power : array_like
-        Lomb-Scargle power associated with each frequency omega.
+        Lomb-Scargle power associated with each frequency.
         Units of the result depend on the normalization.
+
+    References
+    ----------
+    .. [1] M. Zechmeister and M. Kurster, A&A 496, 577-584 (2009)
+    .. [2] W. Press et al, Numerical Recipies in C (2002)
+    .. [3] Scargle, J.D. 1982, ApJ 263:835-853
     """
     if dy is None:
         dy = 1

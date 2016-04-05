@@ -30,6 +30,18 @@ def lombscargle_scipy(t, y, dy, frequency, normalization='normalized',
     center_data : bool (optional, default=True)
         if True, pre-center the data by subtracting the weighted mean
         of the input data.
+
+    Returns
+    -------
+    power : array_like
+        Lomb-Scargle power associated with each frequency.
+        Units of the result depend on the normalization.
+
+    References
+    ----------
+    .. [1] M. Zechmeister and M. Kurster, A&A 496, 577-584 (2009)
+    .. [2] W. Press et al, Numerical Recipies in C (2002)
+    .. [3] Scargle, J.D. 1982, ApJ 263:835-853
     """
     if not HAS_SCIPY:
         raise ValueError("scipy must be installed to use lombscargle_scipy")

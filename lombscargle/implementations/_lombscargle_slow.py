@@ -30,7 +30,7 @@ def lombscargle_slow(t, y, dy, frequency, normalization='normalized',
     Returns
     -------
     power : array_like
-        Lomb-Scargle power associated with each frequency omega.
+        Lomb-Scargle power associated with each frequency.
         Units of the result depend on the normalization.
 
     References

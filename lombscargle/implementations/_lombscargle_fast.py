@@ -38,6 +38,12 @@ def lombscargle_fast(t, y, dy, f0, df, Nf,
         Options are ``oversampling`` and ``Mfft``. See documentation
         of ``trig_sum`` for details.
 
+    Returns
+    -------
+    power : ndarray
+        Lomb-Scargle power associated with each frequency.
+        Units of the result depend on the normalization.
+
     Notes
     -----
     Note that the ``use_fft=True`` algorithm is an approximation to the true

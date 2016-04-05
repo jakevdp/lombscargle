@@ -140,8 +140,6 @@ def lombscargle(t, y, dy=None,
 
     Returns
     -------
-    frequency : array_like
-        Frequencies at which the Lomb-Scargle power is computed
     PLS : array_like
         Lomb-Scargle power associated with each frequency omega
     """
