@@ -92,7 +92,7 @@ def lombscargle(t, y, dy=None,
                 fit_bias=True, center_data=True,
                 method_kwds=None):
     """
-    Lomb-scargle Periodogram
+    Compute the Lomb-scargle Periodogram
 
     Parameters
     ----------
@@ -188,7 +188,7 @@ def lombscargle(t, y, dy=None,
 
 
 class LombScargle(object):
-    """Object wrapper for Lomb-Scargle functionality
+    """Compute the Lomb-Scargle Periodogram
 
     Parameters
     ----------
