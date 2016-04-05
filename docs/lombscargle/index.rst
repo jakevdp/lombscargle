@@ -1,4 +1,4 @@
-.. _lombscargle
+.. _lombscargle:
 
 *******************************************
 Lomb-Scargle Periodograms (``lombscargle``)
