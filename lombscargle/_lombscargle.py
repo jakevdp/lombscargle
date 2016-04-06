@@ -45,6 +45,22 @@ class LombScargle(object):
     >>> freq = np.arange(0.8, 1.3, 0.1)
     >>> LombScargle(t, y).power(freq)
     array([ 0.0204304 , 0.01393987, 0.3559753 , 0.01362127, 0.03112824])
+
+    If the inputs are astropy Quantities with units, the units will be
+    validated and the outputs will also be Quantities with appropriate units:
+
+    >>> from astropy import units as u
+    >>> t = t * u.s
+    >>> y = y * u.mag
+    >>> frequency, power = LombScargle(t, y).autopower()
+    >>> frequency.unit
+    Unit("1 / s")
+    >>> power.unit
+    Unit(dimensionless)
+
+    Note here that the Lomb-Scargle power is always a unitless quantity,
+    because it is related to the :math:`\\chi^2` of the best-fit periodic
+    model at each frequency.
     """
     def __init__(self, t, y, dy=None, fit_bias=True, center_data=True):
         # TODO: validate units here
