@@ -6,6 +6,7 @@ statement for the various implementations available in this submodule
 """
 import numpy as np
 from astropy import units
+from astropy.utils.compat.numpy import broadcast_arrays
 
 from .slow_impl import lombscargle_slow
 from .fast_impl import lombscargle_fast
@@ -48,9 +49,9 @@ def _validate_inputs(t, y, dy=None, frequency=None, strip_units=True):
         dictionary of relevant units
     """
     if dy is None:
-        t, y = np.broadcast_arrays(t, y, subok=True)
+        t, y = broadcast_arrays(t, y, subok=True)
     else:
-        t, y, dy = np.broadcast_arrays(t, y, dy, subok=True)
+        t, y, dy = broadcast_arrays(t, y, dy, subok=True)
 
     if t.ndim != 1:
         raise ValueError("Input times & data must be one-dimensional")
