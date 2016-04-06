@@ -50,7 +50,8 @@ def lombscargle_scipy(t, y, dy, frequency, normalization='normalized',
         dy = np.ravel(np.asarray(dy))
         if dy.size != 1:
             if not np.allclose(dy[0], dy):
-                raise ValueError("scipy method only supports constant errors")
+                raise ValueError("scipy method only supports "
+                                 "uniform uncertainties dy")
 
     t, y = np.broadcast_arrays(t, y)
     frequency = np.asarray(frequency)

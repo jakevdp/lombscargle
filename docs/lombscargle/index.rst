@@ -120,3 +120,5 @@ API Reference
 =============
 
 .. automodapi:: lombscargle
+
+.. automodapi:: lombscargle.implementations

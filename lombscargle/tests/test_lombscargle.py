@@ -4,7 +4,7 @@ from numpy.testing import assert_allclose, assert_equal
 
 from astropy import units
 
-from .. import lombscargle, LombScargle
+from .. import LombScargle, lombscargle
 from ..implementations import lombscargle_slow
 
 from ..heuristics import baseline_heuristic
