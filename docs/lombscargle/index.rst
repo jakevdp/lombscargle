@@ -103,6 +103,13 @@ than a simple sine wave:
               ylabel='Lomb-Scargle Power',
               xlim=(0.4, 1.0));
 
+    phase = (t * freq[np.argmax(PLS)] + 0.2) % 1
+    inset = fig.add_axes([0.74, 0.56, 0.15, 0.3])
+    inset.errorbar(phase, mag, dmag, fmt='.k', capsize=0)
+    inset.invert_yaxis()
+    inset.set_xlabel('phase')
+    inset.set_ylabel('mag')
+
     fig.suptitle('Lomb-Scargle Periodogram (period=0.6 days)');
 
 References
