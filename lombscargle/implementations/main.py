@@ -25,12 +25,13 @@ def _validate_inputs(t, y, dy=None, frequency=None, strip_units=True):
     This utility function serves a few purposes:
 
     - it validates that the shapes of t, y, and dy match, and broadcasts
-      them to a common 1D array
+      them to a common 1D shape
     - if any of t, y, day, or frequency are astropy Quantities (i.e. have
       units attached), it validates that the units are compatible, and does
       any necessary unit conversions
     - if ``strip_units == True``, it strips units from all the arrays
-      before returning them
+      before returning them.
+    - all relevant units are returned in ``unit_dict``
 
     Parameters
     ----------
@@ -42,7 +43,9 @@ def _validate_inputs(t, y, dy=None, frequency=None, strip_units=True):
     Returns
     -------
     t, y, dy, frequency : ndarray, Quantity, or None
-    units : dict
+        reshaped and/or unit-stripped arrays
+    unit_dict : dict
+        dictionary of relevant units
     """
     if dy is None:
         t, y = np.broadcast_arrays(t, y, subok=True)
@@ -79,10 +82,6 @@ def _validate_inputs(t, y, dy=None, frequency=None, strip_units=True):
         t = np.asarray(t)
         y = np.asarray(y)
         if dy is not None:
-            dy = np.asarray(dy)
-        if dy is None:
-            dy = np.array(1)
-        else:
             dy = np.asarray(dy)
 
     def get_unit(val):
@@ -125,10 +124,8 @@ def _get_frequency_grid(frequency, assume_regular_frequency=False):
         Parameters such that all(frequency == f0 + df * np.arange(N))
     """
     frequency = np.asarray(frequency)
-    if frequency.ndim >= 2:
-        raise ValueError("frequency grid must be 0 or 1 dimensions")
-    elif frequency.ndim == 0:
-        return frequency, frequency, 1
+    if frequency.ndim != 1:
+        raise ValueError("frequency grid must be 1 dimensional")
     elif len(frequency) == 1:
         return frequency[0], frequency[0], 1
     elif not assume_regular_frequency:
@@ -209,8 +206,13 @@ def lombscargle(t, y, dy=None,
     frequency = frequency.ravel()
 
     if method == 'auto':
-        # TODO: better choices here
-        method = 'fast'
+        # TODO: make more careful choices here
+        if len(frequency) > 100:
+            method = 'fast'
+        elif dy is None and not fit_bias:
+            method = 'scipy'
+        else:
+            method = 'slow'
 
     if method == 'fast':
         f0, df, Nf = _get_frequency_grid(frequency, assume_regular_frequency)

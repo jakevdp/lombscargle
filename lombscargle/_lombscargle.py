@@ -44,7 +44,7 @@ class LombScargle(object):
 
     >>> freq = np.arange(0.8, 1.3, 0.1)
     >>> LombScargle(t, y).power(freq)
-    array([ 0.0204304 , 0.01393987, 0.3559753 , 0.01362127, 0.03112824])
+    array([ 0.0204304 ,  0.01393845,  0.35552682,  0.01358029,  0.03083737])
 
     If the inputs are astropy Quantities with units, the units will be
     validated and the outputs will also be Quantities with appropriate units:
