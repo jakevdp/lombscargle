@@ -31,7 +31,7 @@ on the input data, can be computed as follows::
 Plotting the result with matplotlib gives::
 
    >>> import matplotlib.pyplot as plt
-   >>> plt.plot(frequency, power)
+   >>> plt.plot(frequency, power)   # doctest: +SKIP
 
 .. plot::
 
