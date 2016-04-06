@@ -85,7 +85,7 @@ than a simple sine wave:
 
     from lombscargle import LombScargle
 
-    plt.style.use(style='ggplot')
+    plt.style.use('ggplot')
     fig, ax = plt.subplots(1, 2, figsize=(12, 4))
     fig.subplots_adjust(bottom=0.12)  # stop labels from getting cut-off
 
