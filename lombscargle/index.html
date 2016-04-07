@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev54</title>
+    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev57</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.dev54',
+        VERSION:     '0.1.dev57',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
-    <link rel="top" title="lombscargle v0.1.dev54" href="../index.html" />
+    <link rel="top" title="lombscargle v0.1.dev57" href="../index.html" />
     <link rel="next" title="LombScargle" href="../api/lombscargle.LombScargle.html" />
     <link rel="prev" title="Lomb-Scargle Periodograms in AstroPy" href="../index.html" />
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
@@ -68,7 +68,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">lombscargle v0.1.dev54</a>
+	<a href="../index.html">lombscargle v0.1.dev57</a>
 	 &raquo;
       </li>
       
@@ -158,7 +158,7 @@ the Lomb-Scargle power <em>P</em> is a dimensionless quantity satisfying <em>0 �
 <div class="section" id="specifying-the-frequency">
 <h3>Specifying the Frequency<a class="headerlink" href="#specifying-the-frequency" title="Permalink to this headline">¶</a></h3>
 <p>With the <code class="docutils literal"><span class="pre">autopower()</span></code> method used above, a heuristic is applied to select
-a valid frequency grid. By default, the heuristic assumes that the width of
+a suitable frequency grid. By default, the heuristic assumes that the width of
 peaks is inversely proportional to the observation baseline, and that the
 maximum frequency is a factor of 5 larger than the so-called &#8220;average Nyquist
 frequency&#8221;, computed based on the average observation spacing.</p>
@@ -168,24 +168,25 @@ For this reason, the heuristic can be tuned through keywords passed to the
 <a class="reference internal" href="../api/lombscargle.heuristics.baseline_heuristic.html#lombscargle.heuristics.baseline_heuristic" title="lombscargle.heuristics.baseline_heuristic"><code class="xref py py-func docutils literal"><span class="pre">baseline_heuristic()</span></code></a> function. For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">(</span><span class="n">nyquist_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">frequency</span><span class="p">),</span> <span class="n">frequency</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">frequency</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-<span class="go">(500, 0.0010260648866521115, 1.0250388217654594)</span>
+<span class="go">(500, 0.0010189890448009111, 1.0179700557561102)</span>
 </pre></div>
 </div>
 <p>Here the highest frequency is two times the average Nyquist frequency.
 If we increase the <code class="docutils literal"><span class="pre">nyquist_factor</span></code>, we can probe higher frequencies:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">(</span><span class="n">nyquist_factor</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">frequency</span><span class="p">),</span> <span class="n">frequency</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">frequency</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-<span class="go">(2500, 0.0010260648866521115, 5.1292983683739051)</span>
+<span class="go">(2500, 0.0010189890448009111, 5.0939262349597545)</span>
 </pre></div>
 </div>
 <p>Alternatively, we can use the <code class="docutils literal"><span class="pre">power()</span></code> method to evaluate the periodogram
 at a user-specified set of frequencies:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">freqency</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note that the fastest Lomb-Scargle implementation requires regularly-spaced
-frequencies, so it is best.</p>
+frequencies; if frequencies are irregularly-spaced, a slower method will be
+used instead.</p>
 <div class="section" id="frequency-grid-spacing">
 <h4>Frequency Grid Spacing<a class="headerlink" href="#frequency-grid-spacing" title="Permalink to this headline">¶</a></h4>
 <p>One common issue with user-specified frequencies is choosing too coarse a
@@ -416,7 +417,7 @@ of unevenly sampled data&#8221;. ApJ 1:338, p. 277 (1989)</td></tr>
   <p>
     &copy; Copyright 2016, Jake VanderPlas.<br/>
     Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
-    Last built 06 Apr 2016. <br/>
+    Last built 07 Apr 2016. <br/>
   </p>
 </footer>
   </body>
