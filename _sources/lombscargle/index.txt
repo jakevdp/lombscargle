@@ -11,8 +11,11 @@ The ``lombscargle`` package contains a unified interface to several
 implementations of the Lomb-Scargle periodogram, including a fast *O[NlogN]*
 implementation following the algorithm presented by Press & Rybicki [3]_.
 
-The code here is adapted from the [gatspy](http://astroml.org/gatspy) package,
+The code here is adapted from the `gatspy`_ package,
 described in [4]_ and [5]_.
+
+.. _gatspy: http://astroml.org/gatspy
+
 
 Quick Start Guide
 =================
