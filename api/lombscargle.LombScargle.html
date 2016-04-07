@@ -1,0 +1,397 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>LombScargle &mdash; lombscargle v0.1.dev54</title>
+    
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.dev54',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="top" title="lombscargle v0.1.dev54" href="../index.html" />
+    <link rel="up" title="Lomb-Scargle Periodograms (lombscargle)" href="../lombscargle/index.html" />
+    <link rel="next" title="lombscargle" href="lombscargle.implementations.lombscargle.html" />
+    <link rel="prev" title="Lomb-Scargle Periodograms (lombscargle)" href="../lombscargle/index.html" />
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+<script type="text/javascript" src="../_static/copybutton.js"></script>
+
+
+  </head>
+  <body role="document">
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">astro</span><span id="logotext2">py</span><span id="logotext3">:docs</span></a>
+  <ul>
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="lombscargle.implementations.lombscargle.html" title="lombscargle">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="../lombscargle/index.html" title="Lomb-Scargle Periodograms (lombscargle)">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">lombscargle v0.1.dev54</a>
+	 &raquo;
+      </li>
+      <li><a href="../lombscargle/index.html" accesskey="U">Lomb-Scargle Periodograms (<code class="docutils literal"><span class="pre">lombscargle</span></code>)</a> &raquo;</li>
+      
+      <li>LombScargle</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="lombscargle">
+<h1>LombScargle<a class="headerlink" href="#lombscargle" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lombscargle.LombScargle">
+<em class="property">class </em><code class="descclassname">lombscargle.</code><code class="descname">LombScargle</code><span class="sig-paren">(</span><em>t</em>, <em>y</em>, <em>dy=None</em>, <em>fit_bias=True</em>, <em>center_data=True</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/_lombscargle.py#L9" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/_lombscargle.html#LombScargle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.LombScargle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3/library/functions.html#object" title="(in Python v3.4)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Compute the Lomb-Scargle Periodogram</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>t</strong> : array_like or Quantity</p>
+<blockquote>
+<div><p>sequence of observation times</p>
+</div></blockquote>
+<p><strong>y</strong> : array_like or Quantity</p>
+<blockquote>
+<div><p>sequence of observations associated with times t</p>
+</div></blockquote>
+<p><strong>dy</strong> : float, array_like or Quantity (optional)</p>
+<blockquote>
+<div><p>error or sequence of observational errors associated with times t</p>
+</div></blockquote>
+<p><strong>fit_bias</strong> : bool (optional, default=True)</p>
+<blockquote>
+<div><p>if True, include a constant offet as part of the model at each
+frequency. This can lead to more accurate results, especially in then
+case of incomplete phase coverage.</p>
+</div></blockquote>
+<p><strong>center_data</strong> : bool (optional, default=True)</p>
+<blockquote class="last">
+<div><p>if True, pre-center the data by subtracting the weighted mean
+of the input data. This is especially important if <code class="xref py py-obj docutils literal"><span class="pre">fit_bias</span> <span class="pre">=</span> <span class="pre">False</span></code></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Generate noisy periodic data:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">rand</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">rand</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compute the Lomb-Scargle periodogram on an automatically-determined
+frequency grid &amp; find the frequency of max power:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">power</span><span class="p">)]</span>
+<span class="go">1.0016662310392956</span>
+</pre></div>
+</div>
+<p>Compute the Lomb-Scargle periodogram at a user-specified frequency grid:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+<span class="go">array([ 0.0204304 ,  0.01393845,  0.35552682,  0.01358029,  0.03083737])</span>
+</pre></div>
+</div>
+<p>If the inputs are astropy Quantities with units, the units will be
+validated and the outputs will also be Quantities with appropriate units:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">s</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">mag</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span>
+<span class="go">Unit(&quot;1 / s&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span><span class="o">.</span><span class="n">unit</span>
+<span class="go">Unit(dimensionless)</span>
+</pre></div>
+</div>
+<p>Note here that the Lomb-Scargle power is always a unitless quantity,
+because it is related to the <img class="math" src="../_images/math/8bd0685e3bf9101859d24cf0e851651f182364c9.png" alt="\chi^2"/> of the best-fit periodic
+model at each frequency.</p>
+<p class="rubric">Methods Summary</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#lombscargle.LombScargle.autofrequency" title="lombscargle.LombScargle.autofrequency"><code class="xref py py-obj docutils literal"><span class="pre">autofrequency</span></code></a>(t[,&nbsp;heuristic])</td>
+<td>Use a heuristic to compute the frequency for the given times</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#lombscargle.LombScargle.autopower" title="lombscargle.LombScargle.autopower"><code class="xref py py-obj docutils literal"><span class="pre">autopower</span></code></a>([frequency_heuristic,&nbsp;method,&nbsp;...])</td>
+<td>Compute the Lomb-Scargle power at the given frequencies</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lombscargle.LombScargle.model" title="lombscargle.LombScargle.model"><code class="xref py py-obj docutils literal"><span class="pre">model</span></code></a>(t,&nbsp;frequency)</td>
+<td>Compute the Lomb-Scargle model at the given frequency</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#lombscargle.LombScargle.power" title="lombscargle.LombScargle.power"><code class="xref py py-obj docutils literal"><span class="pre">power</span></code></a>(frequency[,&nbsp;normalization,&nbsp;method,&nbsp;...])</td>
+<td>Compute the Lomb-Scargle power at the given frequencies</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="classmethod">
+<dt id="lombscargle.LombScargle.autofrequency">
+<em class="property">classmethod </em><code class="descname">autofrequency</code><span class="sig-paren">(</span><em>t</em>, <em>heuristic='baseline'</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/_lombscargle.py#L73" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/_lombscargle.html#LombScargle.autofrequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.LombScargle.autofrequency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use a heuristic to compute the frequency for the given times</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>t</strong> : array_like or Quantity</p>
+<blockquote>
+<div><p>The sampling times of the data</p>
+</div></blockquote>
+<p><strong>heuristic</strong> : string</p>
+<blockquote>
+<div><p>The type of heuristic to use. Currently only &#8216;baseline&#8217; is
+supported</p>
+</div></blockquote>
+<p><strong>**kwargs :</strong></p>
+<blockquote>
+<div><p>additional keyword arguments will be passed to the frequency
+heuristic.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>frequency</strong> : ndarray or Quantity</p>
+<blockquote class="last">
+<div><p>The heuristically-determined optimal frequency bin</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lombscargle.LombScargle.autopower">
+<code class="descname">autopower</code><span class="sig-paren">(</span><em>frequency_heuristic='baseline'</em>, <em>method='auto'</em>, <em>method_kwds=None</em>, <em>normalization='normalized'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/_lombscargle.py#L97" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/_lombscargle.html#LombScargle.autopower"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.LombScargle.autopower" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Lomb-Scargle power at the given frequencies</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frequency_heuristic</strong> : string (optional, default=&#8217;baseline&#8217;)</p>
+<blockquote>
+<div><p>the frequency heuristic to use. By default, it is assumed that the
+observation baseline will drive the peak width.</p>
+</div></blockquote>
+<p><strong>method</strong> : string (optional)</p>
+<blockquote>
+<div><p>specify the lomb scargle implementation to use. Options are:</p>
+<ul class="simple">
+<li>&#8216;auto&#8217;: choose the best method based on the input</li>
+<li>&#8216;fast&#8217;: use the O[N log N] fast method. Note that this requires
+evenly-spaced frequencies: by default this will be checked unless
+<code class="xref py py-obj docutils literal"><span class="pre">assume_regular_frequency</span></code> is set to True.</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">slow</span></code>: use the O[N^2] pure-python implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">matrix</span></code>: use the O[N^2] matrix/linear-fitting implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">scipy</span></code>: use <code class="docutils literal"><span class="pre">scipy.signal.lombscargle</span></code>, which is an O[N^2]
+implementation written in C. Note that this does not support
+heteroskedastic errors.</li>
+</ul>
+</div></blockquote>
+<p><strong>method_kwds</strong> : dict (optional)</p>
+<blockquote>
+<div><p>additional keywords to pass to the lomb-scargle method</p>
+</div></blockquote>
+<p><strong>normalization</strong> : string (optional, default=&#8217;normalized&#8217;)</p>
+<blockquote>
+<div><p>Normalization to use for the periodogram. Options are &#8216;normalized&#8217; or
+&#8216;unnormalized&#8217;.</p>
+</div></blockquote>
+<p><strong>**kwargs :</strong></p>
+<blockquote>
+<div><p>additional keyword arguments will be passed to the frequency
+heuristic.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>frequency, power</strong> : ndarrays</p>
+<blockquote class="last">
+<div><p>The frequency and Lomb-Scargle power</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lombscargle.LombScargle.model">
+<code class="descname">model</code><span class="sig-paren">(</span><em>t</em>, <em>frequency</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/_lombscargle.py#L202" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/_lombscargle.html#LombScargle.model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.LombScargle.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Lomb-Scargle model at the given frequency</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>t</strong> : array_like, length n_samples</p>
+<blockquote>
+<div><p>times at which to compute the model</p>
+</div></blockquote>
+<p><strong>frequency</strong> : float</p>
+<blockquote>
+<div><p>the frequency for the model</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>y</strong> : np.ndarray, length n_samples</p>
+<blockquote class="last">
+<div><p>The model fit corresponding to the input times</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lombscargle.LombScargle.power">
+<code class="descname">power</code><span class="sig-paren">(</span><em>frequency</em>, <em>normalization='normalized'</em>, <em>method='auto'</em>, <em>assume_regular_frequency=False</em>, <em>method_kwds=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/_lombscargle.py#L145" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/_lombscargle.html#LombScargle.power"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.LombScargle.power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Lomb-Scargle power at the given frequencies</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frequency</strong> : array_like or Quantity</p>
+<blockquote>
+<div><p>frequencies (not angular frequencies) at which to evaluate the
+periodogram. Note that in order to use method=&#8217;fast&#8217;, frequencies
+must be regularly-spaced.</p>
+</div></blockquote>
+<p><strong>method</strong> : string (optional)</p>
+<blockquote>
+<div><p>specify the lomb scargle implementation to use. Options are:</p>
+<ul class="simple">
+<li>&#8216;auto&#8217;: choose the best method based on the input</li>
+<li>&#8216;fast&#8217;: use the O[N log N] fast method. Note that this requires
+evenly-spaced frequencies: by default this will be checked unless
+<code class="xref py py-obj docutils literal"><span class="pre">assume_regular_frequency</span></code> is set to True.</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">slow</span></code>: use the O[N^2] pure-python implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">matrix</span></code>: use the O[N^2] matrix/linear-fitting implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">scipy</span></code>: use <code class="docutils literal"><span class="pre">scipy.signal.lombscargle</span></code>, which is an O[N^2]
+implementation written in C. Note that this does not support
+heteroskedastic errors.</li>
+</ul>
+</div></blockquote>
+<p><strong>assume_regular_frequency</strong> : bool (optional)</p>
+<blockquote>
+<div><p>if True, assume that the input frequency is of the form
+freq = f0 + df * np.arange(N). Only referenced if method is &#8216;auto&#8217;
+or &#8216;fast&#8217;.</p>
+</div></blockquote>
+<p><strong>normalization</strong> : string (optional, default=&#8217;normalized&#8217;)</p>
+<blockquote>
+<div><p>Normalization to use for the periodogram. Options are &#8216;normalized&#8217;
+or &#8216;unnormalized&#8217;.</p>
+</div></blockquote>
+<p><strong>fit_bias</strong> : bool (optional, default=True)</p>
+<blockquote>
+<div><p>if True, include a constant offet as part of the model at each
+frequency. This can lead to more accurate results, especially in
+the case of incomplete phase coverage.</p>
+</div></blockquote>
+<p><strong>center_data</strong> : bool (optional, default=True)</p>
+<blockquote>
+<div><p>if True, pre-center the data by subtracting the weighted mean
+of the input data. This is especially important if <code class="xref py py-obj docutils literal"><span class="pre">fit_bias</span> <span class="pre">=</span> <span class="pre">False</span></code></p>
+</div></blockquote>
+<p><strong>method_kwds</strong> : dict (optional)</p>
+<blockquote>
+<div><p>additional keywords to pass to the lomb-scargle method</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>power</strong> : ndarray</p>
+<blockquote class="last">
+<div><p>The Lomb-Scargle power at the specified frequency</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">LombScargle</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="http://github.com/jakevdp/lombscargle/tree/master/docs/api/lombscargle.LombScargle.rst">Edit This Page on Github</a> &nbsp;
+    <a href="../_sources/api/lombscargle.LombScargle.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2016, Jake VanderPlas.<br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
+    Last built 06 Apr 2016. <br/>
+  </p>
+</footer>
+  </body>
+</html>

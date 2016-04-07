@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lombscargle_fast &mdash; lombscargle v0.1.dev54</title>
+    
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.dev54',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="top" title="lombscargle v0.1.dev54" href="../index.html" />
+    <link rel="up" title="Lomb-Scargle Periodograms (lombscargle)" href="../lombscargle/index.html" />
+    <link rel="next" title="lombscargle_matrix" href="lombscargle.implementations.lombscargle_matrix.html" />
+    <link rel="prev" title="lombscargle" href="lombscargle.implementations.lombscargle.html" />
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+<script type="text/javascript" src="../_static/copybutton.js"></script>
+
+
+  </head>
+  <body role="document">
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">astro</span><span id="logotext2">py</span><span id="logotext3">:docs</span></a>
+  <ul>
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="lombscargle.implementations.lombscargle_matrix.html" title="lombscargle_matrix">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="lombscargle.implementations.lombscargle.html" title="lombscargle">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">lombscargle v0.1.dev54</a>
+	 &raquo;
+      </li>
+      <li><a href="../lombscargle/index.html" accesskey="U">Lomb-Scargle Periodograms (<code class="docutils literal"><span class="pre">lombscargle</span></code>)</a> &raquo;</li>
+      
+      <li>lombscargle_fast</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="lombscargle-fast">
+<h1>lombscargle_fast<a class="headerlink" href="#lombscargle-fast" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="lombscargle.implementations.lombscargle_fast">
+<code class="descclassname">lombscargle.implementations.</code><code class="descname">lombscargle_fast</code><span class="sig-paren">(</span><em>t</em>, <em>y</em>, <em>dy</em>, <em>f0</em>, <em>df</em>, <em>Nf</em>, <em>center_data=True</em>, <em>fit_bias=True</em>, <em>normalization='normalized'</em>, <em>use_fft=True</em>, <em>trig_sum_kwds=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/implementations/fast_impl.py#L9" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/implementations/fast_impl.html#lombscargle_fast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.implementations.lombscargle_fast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fast Lomb-Scargle Periodogram</p>
+<p>This implements the Press &amp; Rybicki method <a class="reference internal" href="#r1" id="id1">[R1]</a> for fast O[N log(N)]
+Lomb-Scargle periodograms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>t, y, dy</strong> : array_like</p>
+<blockquote>
+<div><p>times, values, and errors of the data points. These should be
+broadcastable to the same shape.</p>
+</div></blockquote>
+<p><strong>f0, df, Nf</strong> : (float, float, int)</p>
+<blockquote>
+<div><p>parameters describing the frequency grid, f = f0 + df * arange(Nf).</p>
+</div></blockquote>
+<p><strong>center_data</strong> : bool (default=True)</p>
+<blockquote>
+<div><p>Specify whether to subtract the mean of the data before the fit</p>
+</div></blockquote>
+<p><strong>fit_bias</strong> : bool (default=True)</p>
+<blockquote>
+<div><p>If True, then compute the floating-mean periodogram; i.e. let the mean
+vary with the fit.</p>
+</div></blockquote>
+<p><strong>normalization</strong> : string (optional, default=&#8217;normalized&#8217;)</p>
+<blockquote>
+<div><p>Normalization to use for the periodogram
+TODO: figure out what options to use</p>
+</div></blockquote>
+<p><strong>use_fft</strong> : bool (default=True)</p>
+<blockquote>
+<div><p>If True, then use the Press &amp; Rybicki O[NlogN] algorithm to compute
+the result. Otherwise, use a slower O[N^2] algorithm</p>
+</div></blockquote>
+<p><strong>trig_sum_kwds</strong> : dict or None (optional)</p>
+<blockquote>
+<div><p>extra keyword arguments to pass to the <code class="docutils literal"><span class="pre">trig_sum</span></code> utility.
+Options are <code class="docutils literal"><span class="pre">oversampling</span></code> and <code class="docutils literal"><span class="pre">Mfft</span></code>. See documentation
+of <code class="docutils literal"><span class="pre">trig_sum</span></code> for details.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>power</strong> : ndarray</p>
+<blockquote class="last">
+<div><p>Lomb-Scargle power associated with each frequency.
+Units of the result depend on the normalization.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Note that the <code class="docutils literal"><span class="pre">use_fft=True</span></code> algorithm is an approximation to the true
+Lomb-Scargle periodogram, and as the number of points grows this
+approximation improves. On the other hand, for very small datasets
+(&lt;~50 points or so) this approximation may not be useful.</p>
+<p class="rubric">References</p>
+<table class="docutils citation" frame="void" id="r1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[R1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> Press W.H. and Rybicki, G.B, &#8220;Fast algorithm for spectral analysis
+of unevenly sampled data&#8221;. ApJ 1:338, p277, 1989</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="r2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[R2]</a></td><td><ol class="first last upperalpha simple" start="13">
+<li>Zechmeister and M. Kurster, A&amp;A 496, 577-584 (2009)</li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="r3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[R3]</a></td><td><ol class="first last upperalpha simple" start="23">
+<li>Press et al, Numerical Recipies in C (2002)</li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">lombscargle_fast</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="http://github.com/jakevdp/lombscargle/tree/master/docs/api/lombscargle.implementations.lombscargle_fast.rst">Edit This Page on Github</a> &nbsp;
+    <a href="../_sources/api/lombscargle.implementations.lombscargle_fast.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2016, Jake VanderPlas.<br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
+    Last built 06 Apr 2016. <br/>
+  </p>
+</footer>
+  </body>
+</html>

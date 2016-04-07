@@ -1,0 +1,8 @@
+
+
+lombscargle
+=======================================
+
+.. currentmodule:: lombscargle.implementations
+
+.. autofunction:: lombscargle

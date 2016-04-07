@@ -1,0 +1,8 @@
+
+
+get_heuristic
+====================================
+
+.. currentmodule:: lombscargle.heuristics
+
+.. autofunction:: get_heuristic

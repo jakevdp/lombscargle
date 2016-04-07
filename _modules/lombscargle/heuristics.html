@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lombscargle.heuristics &mdash; lombscargle v0.1.dev54</title>
+    
+    <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.dev54',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/sidebar.js"></script>
+    <link rel="shortcut icon" href="../../_static/astropy_logo.ico"/>
+    <link rel="top" title="lombscargle v0.1.dev54" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+<script type="text/javascript" src="../../_static/copybutton.js"></script>
+
+
+  </head>
+  <body role="document">
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../index.html"><span id="logotext1">astro</span><span id="logotext2">py</span><span id="logotext3">:docs</span></a>
+  <ul>
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../index.html">lombscargle v0.1.dev54</a>
+	 &raquo;
+      </li>
+      <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for lombscargle.heuristics</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="get_heuristic"><a class="viewcode-back" href="../../api/lombscargle.heuristics.get_heuristic.html#lombscargle.heuristics.get_heuristic">[docs]</a><span class="k">def</span> <span class="nf">get_heuristic</span><span class="p">(</span><span class="n">heuristic</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">heuristic</span> <span class="o">==</span> <span class="s1">&#39;baseline&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">baseline_heuristic</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized heuristic &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">heuristic</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="baseline_heuristic"><a class="viewcode-back" href="../../api/lombscargle.heuristics.baseline_heuristic.html#lombscargle.heuristics.baseline_heuristic">[docs]</a><span class="k">def</span> <span class="nf">baseline_heuristic</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">baseline</span><span class="p">,</span>
+                       <span class="n">samples_per_peak</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                       <span class="n">nyquist_factor</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                       <span class="n">minimum_frequency</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                       <span class="n">maximum_frequency</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Use a heuristic to compute a frequency grid.</span>
+
+<span class="sd">    Note that this assumes that the baseline is much larger than the</span>
+<span class="sd">    oscillation period, such that the peak widths are driven by the baseline.</span>
+<span class="sd">    If you are searching for periods longer than the baseline of your</span>
+<span class="sd">    observations, this will not perform well.</span>
+
+<span class="sd">    Even with a large baseline, be aware that this heuristic is based on the</span>
+<span class="sd">    concept of &quot;average Nyquist frequency&quot;, which is fundamentally incorrect</span>
+<span class="sd">    for irregularly-sampled data. The `nyquist_factor` provides a fudge factor</span>
+<span class="sd">    that allows sampling of higher frequencies.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_samples : int</span>
+<span class="sd">        the number of samples in your dataset. This is used to guess at the</span>
+<span class="sd">        maximum frequency if ``maximum_frequency`` is not provided.</span>
+<span class="sd">    baseline : float</span>
+<span class="sd">        the difference between the maximum and minimum observation times.</span>
+<span class="sd">        This is used to estimate the peak width, and thus choose the frequency</span>
+<span class="sd">        spacing.</span>
+<span class="sd">    samples_per_peak : float (optional, default=5)</span>
+<span class="sd">        The approximate number of desired samples across the typical peak width</span>
+<span class="sd">    nyquist_factor : float (optional, default=5)</span>
+<span class="sd">        The multiple of the average nyquist frequency used to choose the</span>
+<span class="sd">        maximum frequency if ``maximum_frequency`` is not provided.</span>
+<span class="sd">    minimum_frequency : float (optional)</span>
+<span class="sd">        If specified, then use this minimum frequency rather than one chosen</span>
+<span class="sd">        based on the size of the baseline.</span>
+<span class="sd">    maximum_frequency : float (optional)</span>
+<span class="sd">        If specified, then use this maximum frequency rather than one chosen</span>
+<span class="sd">        based on the average nyquist frequency.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    freq : ndarray</span>
+<span class="sd">        an array `freq_min + freq_spacing * np.arange(N_freq)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">baseline</span> <span class="o">/</span> <span class="n">samples_per_peak</span>
+
+    <span class="k">if</span> <span class="n">minimum_frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">f0</span> <span class="o">=</span> <span class="n">minimum_frequency</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">f0</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">df</span>
+
+    <span class="k">if</span> <span class="n">maximum_frequency</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">Nf</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">maximum_frequency</span> <span class="o">-</span> <span class="n">f0</span><span class="p">)</span> <span class="o">/</span> <span class="n">df</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Nf</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">samples_per_peak</span> <span class="o">*</span> <span class="n">nyquist_factor</span> <span class="o">*</span> <span class="n">n_samples</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f0</span> <span class="o">+</span> <span class="n">df</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Nf</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2016, Jake VanderPlas.<br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
+    Last built 06 Apr 2016. <br/>
+  </p>
+</footer>
+  </body>
+</html>

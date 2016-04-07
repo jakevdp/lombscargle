@@ -1,0 +1,50 @@
+
+
+LombScargle
+=======================
+
+.. currentmodule:: lombscargle
+
+.. autoclass:: LombScargle
+   :show-inheritance:
+
+   
+     
+   
+
+   
+   
+   
+
+   
+   
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+   
+      ~LombScargle.autofrequency
+      ~LombScargle.autopower
+      ~LombScargle.model
+      ~LombScargle.power
+
+   
+   
+
+   
+   
+   
+
+   
+   
+
+   .. rubric:: Methods Documentation
+
+   
+   .. automethod:: autofrequency
+   .. automethod:: autopower
+   .. automethod:: model
+   .. automethod:: power
+
+   
+   

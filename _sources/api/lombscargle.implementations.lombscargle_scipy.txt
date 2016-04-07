@@ -1,0 +1,8 @@
+
+
+lombscargle_scipy
+=============================================
+
+.. currentmodule:: lombscargle.implementations
+
+.. autofunction:: lombscargle_scipy

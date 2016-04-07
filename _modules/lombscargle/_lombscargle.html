@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lombscargle._lombscargle &mdash; lombscargle v0.1.dev54</title>
+    
+    <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.dev54',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/sidebar.js"></script>
+    <link rel="shortcut icon" href="../../_static/astropy_logo.ico"/>
+    <link rel="top" title="lombscargle v0.1.dev54" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+<script type="text/javascript" src="../../_static/copybutton.js"></script>
+
+
+  </head>
+  <body role="document">
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../index.html"><span id="logotext1">astro</span><span id="logotext2">py</span><span id="logotext3">:docs</span></a>
+  <ul>
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../index.html">lombscargle v0.1.dev54</a>
+	 &raquo;
+      </li>
+      <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for lombscargle._lombscargle</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Main Lomb-Scargle Implementation&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.heuristics</span> <span class="kn">import</span> <span class="n">get_heuristic</span>
+<span class="kn">from</span> <span class="nn">.implementations</span> <span class="kn">import</span> <span class="n">lombscargle</span>
+<span class="kn">from</span> <span class="nn">.implementations.mle</span> <span class="kn">import</span> <span class="n">periodic_fit</span>
+
+
+<div class="viewcode-block" id="LombScargle"><a class="viewcode-back" href="../../api/lombscargle.LombScargle.html#lombscargle.LombScargle">[docs]</a><span class="k">class</span> <span class="nc">LombScargle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the Lomb-Scargle Periodogram</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : array_like or Quantity</span>
+<span class="sd">        sequence of observation times</span>
+<span class="sd">    y : array_like or Quantity</span>
+<span class="sd">        sequence of observations associated with times t</span>
+<span class="sd">    dy : float, array_like or Quantity (optional)</span>
+<span class="sd">        error or sequence of observational errors associated with times t</span>
+<span class="sd">    fit_bias : bool (optional, default=True)</span>
+<span class="sd">        if True, include a constant offet as part of the model at each</span>
+<span class="sd">        frequency. This can lead to more accurate results, especially in then</span>
+<span class="sd">        case of incomplete phase coverage.</span>
+<span class="sd">    center_data : bool (optional, default=True)</span>
+<span class="sd">        if True, pre-center the data by subtracting the weighted mean</span>
+<span class="sd">        of the input data. This is especially important if `fit_bias = False`</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Generate noisy periodic data:</span>
+
+<span class="sd">    &gt;&gt;&gt; rand = np.random.RandomState(42)</span>
+<span class="sd">    &gt;&gt;&gt; t = 100 * rand.rand(100)</span>
+<span class="sd">    &gt;&gt;&gt; y = np.sin(2 * np.pi * t) + rand.randn(100)</span>
+
+<span class="sd">    Compute the Lomb-Scargle periodogram on an automatically-determined</span>
+<span class="sd">    frequency grid &amp; find the frequency of max power:</span>
+
+<span class="sd">    &gt;&gt;&gt; frequency, power = LombScargle(t, y).autopower()</span>
+<span class="sd">    &gt;&gt;&gt; frequency[np.argmax(power)]</span>
+<span class="sd">    1.0016662310392956</span>
+
+<span class="sd">    Compute the Lomb-Scargle periodogram at a user-specified frequency grid:</span>
+
+<span class="sd">    &gt;&gt;&gt; freq = np.arange(0.8, 1.3, 0.1)</span>
+<span class="sd">    &gt;&gt;&gt; LombScargle(t, y).power(freq)</span>
+<span class="sd">    array([ 0.0204304 ,  0.01393845,  0.35552682,  0.01358029,  0.03083737])</span>
+
+<span class="sd">    If the inputs are astropy Quantities with units, the units will be</span>
+<span class="sd">    validated and the outputs will also be Quantities with appropriate units:</span>
+
+<span class="sd">    &gt;&gt;&gt; from astropy import units as u</span>
+<span class="sd">    &gt;&gt;&gt; t = t * u.s</span>
+<span class="sd">    &gt;&gt;&gt; y = y * u.mag</span>
+<span class="sd">    &gt;&gt;&gt; frequency, power = LombScargle(t, y).autopower()</span>
+<span class="sd">    &gt;&gt;&gt; frequency.unit</span>
+<span class="sd">    Unit(&quot;1 / s&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; power.unit</span>
+<span class="sd">    Unit(dimensionless)</span>
+
+<span class="sd">    Note here that the Lomb-Scargle power is always a unitless quantity,</span>
+<span class="sd">    because it is related to the :math:`\\chi^2` of the best-fit periodic</span>
+<span class="sd">    model at each frequency.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fit_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">center_data</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="c1"># TODO: validate units here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">=</span> <span class="n">dy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_bias</span> <span class="o">=</span> <span class="n">fit_bias</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center_data</span> <span class="o">=</span> <span class="n">center_data</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="LombScargle.autofrequency"><a class="viewcode-back" href="../../api/lombscargle.LombScargle.html#lombscargle.LombScargle.autofrequency">[docs]</a>    <span class="k">def</span> <span class="nf">autofrequency</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">heuristic</span><span class="o">=</span><span class="s1">&#39;baseline&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">heuristic</span> <span class="o">=</span> <span class="n">get_heuristic</span><span class="p">(</span><span class="n">heuristic</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">heuristic</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">baseline</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LombScargle.autopower"><a class="viewcode-back" href="../../api/lombscargle.LombScargle.html#lombscargle.LombScargle.autopower">[docs]</a>    <span class="k">def</span> <span class="nf">autopower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency_heuristic</span><span class="o">=</span><span class="s1">&#39;baseline&#39;</span><span class="p">,</span>
+                  <span class="n">method</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">method_kwds</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                  <span class="n">normalization</span><span class="o">=</span><span class="s1">&#39;normalized&#39;</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the Lomb-Scargle power at the given frequencies</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frequency_heuristic : string (optional, default=&#39;baseline&#39;)</span>
+<span class="sd">            the frequency heuristic to use. By default, it is assumed that the</span>
+<span class="sd">            observation baseline will drive the peak width.</span>
+<span class="sd">        method : string (optional)</span>
+<span class="sd">            specify the lomb scargle implementation to use. Options are:</span>
+
+<span class="sd">            - &#39;auto&#39;: choose the best method based on the input</span>
+<span class="sd">            - &#39;fast&#39;: use the O[N log N] fast method. Note that this requires</span>
+<span class="sd">              evenly-spaced frequencies: by default this will be checked unless</span>
+<span class="sd">              `assume_regular_frequency` is set to True.</span>
+<span class="sd">            - `slow`: use the O[N^2] pure-python implementation</span>
+<span class="sd">            - `matrix`: use the O[N^2] matrix/linear-fitting implementation</span>
+<span class="sd">            - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]</span>
+<span class="sd">              implementation written in C. Note that this does not support</span>
+<span class="sd">              heteroskedastic errors.</span>
+
+<span class="sd">        method_kwds : dict (optional)</span>
+<span class="sd">            additional keywords to pass to the lomb-scargle method</span>
+<span class="sd">        normalization : string (optional, default=&#39;normalized&#39;)</span>
+<span class="sd">            Normalization to use for the periodogram. Options are &#39;normalized&#39; or</span>
+<span class="sd">            &#39;unnormalized&#39;.</span>
+<span class="sd">        **kwargs :</span>
+<span class="sd">            additional keyword arguments will be passed to the frequency</span>
+<span class="sd">            heuristic.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        frequency, power : ndarrays</span>
+<span class="sd">            The frequency and Lomb-Scargle power</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">autofrequency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">frequency_heuristic</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">power</span> <span class="o">=</span> <span class="n">lombscargle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span>
+                            <span class="n">frequency</span><span class="o">=</span><span class="n">frequency</span><span class="p">,</span>
+                            <span class="n">center_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">center_data</span><span class="p">,</span>
+                            <span class="n">fit_bias</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_bias</span><span class="p">,</span>
+                            <span class="n">normalization</span><span class="o">=</span><span class="n">normalization</span><span class="p">,</span>
+                            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">method_kwds</span><span class="o">=</span><span class="n">method_kwds</span><span class="p">,</span>
+                            <span class="n">assume_regular_frequency</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">frequency</span><span class="p">,</span> <span class="n">power</span></div>
+
+<div class="viewcode-block" id="LombScargle.power"><a class="viewcode-back" href="../../api/lombscargle.LombScargle.html#lombscargle.LombScargle.power">[docs]</a>    <span class="k">def</span> <span class="nf">power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="s1">&#39;normalized&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+              <span class="n">assume_regular_frequency</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">method_kwds</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the Lomb-Scargle power at the given frequencies</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frequency : array_like or Quantity</span>
+<span class="sd">            frequencies (not angular frequencies) at which to evaluate the</span>
+<span class="sd">            periodogram. Note that in order to use method=&#39;fast&#39;, frequencies</span>
+<span class="sd">            must be regularly-spaced.</span>
+<span class="sd">        method : string (optional)</span>
+<span class="sd">            specify the lomb scargle implementation to use. Options are:</span>
+
+<span class="sd">            - &#39;auto&#39;: choose the best method based on the input</span>
+<span class="sd">            - &#39;fast&#39;: use the O[N log N] fast method. Note that this requires</span>
+<span class="sd">              evenly-spaced frequencies: by default this will be checked unless</span>
+<span class="sd">              `assume_regular_frequency` is set to True.</span>
+<span class="sd">            - `slow`: use the O[N^2] pure-python implementation</span>
+<span class="sd">            - `matrix`: use the O[N^2] matrix/linear-fitting implementation</span>
+<span class="sd">            - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]</span>
+<span class="sd">              implementation written in C. Note that this does not support</span>
+<span class="sd">              heteroskedastic errors.</span>
+
+<span class="sd">        assume_regular_frequency : bool (optional)</span>
+<span class="sd">            if True, assume that the input frequency is of the form</span>
+<span class="sd">            freq = f0 + df * np.arange(N). Only referenced if method is &#39;auto&#39;</span>
+<span class="sd">            or &#39;fast&#39;.</span>
+<span class="sd">        normalization : string (optional, default=&#39;normalized&#39;)</span>
+<span class="sd">            Normalization to use for the periodogram. Options are &#39;normalized&#39;</span>
+<span class="sd">            or &#39;unnormalized&#39;.</span>
+<span class="sd">        fit_bias : bool (optional, default=True)</span>
+<span class="sd">            if True, include a constant offet as part of the model at each</span>
+<span class="sd">            frequency. This can lead to more accurate results, especially in</span>
+<span class="sd">            the case of incomplete phase coverage.</span>
+<span class="sd">        center_data : bool (optional, default=True)</span>
+<span class="sd">            if True, pre-center the data by subtracting the weighted mean</span>
+<span class="sd">            of the input data. This is especially important if `fit_bias = False`</span>
+<span class="sd">        method_kwds : dict (optional)</span>
+<span class="sd">            additional keywords to pass to the lomb-scargle method</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        power : ndarray</span>
+<span class="sd">            The Lomb-Scargle power at the specified frequency</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must supply a valid frequency. If you would like &quot;</span>
+                             <span class="s2">&quot;an automatic frequency grid, use the autopower() &quot;</span>
+                             <span class="s2">&quot;method.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lombscargle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span>
+                           <span class="n">frequency</span><span class="o">=</span><span class="n">frequency</span><span class="p">,</span>
+                           <span class="n">center_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">center_data</span><span class="p">,</span>
+                           <span class="n">fit_bias</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_bias</span><span class="p">,</span>
+                           <span class="n">normalization</span><span class="o">=</span><span class="n">normalization</span><span class="p">,</span>
+                           <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">method_kwds</span><span class="o">=</span><span class="n">method_kwds</span><span class="p">,</span>
+                           <span class="n">assume_regular_frequency</span><span class="o">=</span><span class="n">assume_regular_frequency</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LombScargle.model"><a class="viewcode-back" href="../../api/lombscargle.LombScargle.html#lombscargle.LombScargle.model">[docs]</a>    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">frequency</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the Lomb-Scargle model at the given frequency</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : array_like, length n_samples</span>
+<span class="sd">            times at which to compute the model</span>
+<span class="sd">        frequency : float</span>
+<span class="sd">            the frequency for the model</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y : np.ndarray, length n_samples</span>
+<span class="sd">            The model fit corresponding to the input times</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: handle units correctly</span>
+        <span class="k">return</span> <span class="n">periodic_fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span>
+                            <span class="n">frequency</span><span class="o">=</span><span class="n">frequency</span><span class="p">,</span> <span class="n">t_fit</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
+                            <span class="n">center_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">center_data</span><span class="p">,</span>
+                            <span class="n">fit_bias</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_bias</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2016, Jake VanderPlas.<br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
+    Last built 06 Apr 2016. <br/>
+  </p>
+</footer>
+  </body>
+</html>

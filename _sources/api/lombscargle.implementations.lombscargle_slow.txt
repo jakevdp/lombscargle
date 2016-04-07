@@ -1,0 +1,8 @@
+
+
+lombscargle_slow
+============================================
+
+.. currentmodule:: lombscargle.implementations
+
+.. autofunction:: lombscargle_slow

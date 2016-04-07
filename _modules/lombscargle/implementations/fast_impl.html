@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lombscargle.implementations.fast_impl &mdash; lombscargle v0.1.dev54</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1.dev54',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/sidebar.js"></script>
+    <link rel="shortcut icon" href="../../../_static/astropy_logo.ico"/>
+    <link rel="top" title="lombscargle v0.1.dev54" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+<script type="text/javascript" src="../../../_static/copybutton.js"></script>
+
+
+  </head>
+  <body role="document">
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../../index.html"><span id="logotext1">astro</span><span id="logotext2">py</span><span id="logotext3">:docs</span></a>
+  <ul>
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../../index.html">lombscargle v0.1.dev54</a>
+	 &raquo;
+      </li>
+      <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for lombscargle.implementations.fast_impl</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">trig_sum</span>
+
+
+<div class="viewcode-block" id="lombscargle_fast"><a class="viewcode-back" href="../../../api/lombscargle.implementations.lombscargle_fast.html#lombscargle.implementations.lombscargle_fast">[docs]</a><span class="k">def</span> <span class="nf">lombscargle_fast</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">Nf</span><span class="p">,</span>
+                     <span class="n">center_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fit_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                     <span class="n">normalization</span><span class="o">=</span><span class="s1">&#39;normalized&#39;</span><span class="p">,</span>
+                     <span class="n">use_fft</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">trig_sum_kwds</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fast Lomb-Scargle Periodogram</span>
+
+<span class="sd">    This implements the Press &amp; Rybicki method [1]_ for fast O[N log(N)]</span>
+<span class="sd">    Lomb-Scargle periodograms.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t, y, dy : array_like</span>
+<span class="sd">        times, values, and errors of the data points. These should be</span>
+<span class="sd">        broadcastable to the same shape.</span>
+<span class="sd">    f0, df, Nf : (float, float, int)</span>
+<span class="sd">        parameters describing the frequency grid, f = f0 + df * arange(Nf).</span>
+<span class="sd">    center_data : bool (default=True)</span>
+<span class="sd">        Specify whether to subtract the mean of the data before the fit</span>
+<span class="sd">    fit_bias : bool (default=True)</span>
+<span class="sd">        If True, then compute the floating-mean periodogram; i.e. let the mean</span>
+<span class="sd">        vary with the fit.</span>
+<span class="sd">    normalization : string (optional, default=&#39;normalized&#39;)</span>
+<span class="sd">        Normalization to use for the periodogram</span>
+<span class="sd">        TODO: figure out what options to use</span>
+<span class="sd">    use_fft : bool (default=True)</span>
+<span class="sd">        If True, then use the Press &amp; Rybicki O[NlogN] algorithm to compute</span>
+<span class="sd">        the result. Otherwise, use a slower O[N^2] algorithm</span>
+<span class="sd">    trig_sum_kwds : dict or None (optional)</span>
+<span class="sd">        extra keyword arguments to pass to the ``trig_sum`` utility.</span>
+<span class="sd">        Options are ``oversampling`` and ``Mfft``. See documentation</span>
+<span class="sd">        of ``trig_sum`` for details.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    power : ndarray</span>
+<span class="sd">        Lomb-Scargle power associated with each frequency.</span>
+<span class="sd">        Units of the result depend on the normalization.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Note that the ``use_fft=True`` algorithm is an approximation to the true</span>
+<span class="sd">    Lomb-Scargle periodogram, and as the number of points grows this</span>
+<span class="sd">    approximation improves. On the other hand, for very small datasets</span>
+<span class="sd">    (&lt;~50 points or so) this approximation may not be useful.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Press W.H. and Rybicki, G.B, &quot;Fast algorithm for spectral analysis</span>
+<span class="sd">        of unevenly sampled data&quot;. ApJ 1:338, p277, 1989</span>
+<span class="sd">    .. [2] M. Zechmeister and M. Kurster, A&amp;A 496, 577-584 (2009)</span>
+<span class="sd">    .. [3] W. Press et al, Numerical Recipies in C (2002)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dy</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># Validate and setup input data</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_arrays</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
+
+    <span class="c1"># Validate and setup frequency grid</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">f0</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">df</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">Nf</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">**</span> <span class="o">-</span><span class="mf">2.0</span>
+    <span class="n">w</span> <span class="o">/=</span> <span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="c1"># Center the data. Even if we&#39;re fitting the offset,</span>
+    <span class="c1"># this step makes the expressions below more succinct</span>
+    <span class="k">if</span> <span class="n">center_data</span> <span class="ow">or</span> <span class="n">fit_bias</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="c1"># set up arguments to trig_sum</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">trig_sum_kwds</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">use_fft</span><span class="o">=</span><span class="n">use_fft</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">Nf</span><span class="p">)</span>
+
+    <span class="c1">#----------------------------------------------------------------------</span>
+    <span class="c1"># 1. compute functions of the time-shift tau at each frequency</span>
+    <span class="n">Sh</span><span class="p">,</span> <span class="n">Ch</span> <span class="o">=</span> <span class="n">trig_sum</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">w</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">S2</span><span class="p">,</span> <span class="n">C2</span> <span class="o">=</span> <span class="n">trig_sum</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">freq_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fit_bias</span><span class="p">:</span>
+        <span class="n">S</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">trig_sum</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="c1"># Filter &quot;invalid value in divide&quot; warnings for zero-frequency</span>
+            <span class="k">if</span> <span class="n">f0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+            <span class="n">tan_2omega_tau</span> <span class="o">=</span> <span class="p">(</span><span class="n">S2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">S</span> <span class="o">*</span> <span class="n">C</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">C2</span> <span class="o">-</span> <span class="p">(</span><span class="n">C</span> <span class="o">*</span> <span class="n">C</span> <span class="o">-</span> <span class="n">S</span> <span class="o">*</span> <span class="n">S</span><span class="p">))</span>
+            <span class="c1"># fix NaN at zero frequency</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">tan_2omega_tau</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">tan_2omega_tau</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tan_2omega_tau</span> <span class="o">=</span> <span class="n">S2</span> <span class="o">/</span> <span class="n">C2</span>
+
+    <span class="c1"># slower/less stable way: we&#39;ll use trig identities instead</span>
+    <span class="c1"># omega_tau = 0.5 * np.arctan(tan_2omega_tau)</span>
+    <span class="c1"># S2w, C2w = np.sin(2 * omega_tau), np.cos(2 * omega_tau)</span>
+    <span class="c1"># Sw, Cw = np.sin(omega_tau), np.cos(omega_tau)</span>
+
+    <span class="n">S2w</span> <span class="o">=</span> <span class="n">tan_2omega_tau</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tan_2omega_tau</span> <span class="o">*</span> <span class="n">tan_2omega_tau</span><span class="p">)</span>
+    <span class="n">C2w</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tan_2omega_tau</span> <span class="o">*</span> <span class="n">tan_2omega_tau</span><span class="p">)</span>
+    <span class="n">Cw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">C2w</span><span class="p">)</span>
+    <span class="n">Sw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">S2w</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">C2w</span><span class="p">)</span>
+
+    <span class="c1">#----------------------------------------------------------------------</span>
+    <span class="c1"># 2. Compute the periodogram, following Zechmeister &amp; Kurster</span>
+    <span class="c1">#    and using tricks from Press &amp; Rybicki.</span>
+    <span class="n">YY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">YC</span> <span class="o">=</span> <span class="n">Ch</span> <span class="o">*</span> <span class="n">Cw</span> <span class="o">+</span> <span class="n">Sh</span> <span class="o">*</span> <span class="n">Sw</span>
+    <span class="n">YS</span> <span class="o">=</span> <span class="n">Sh</span> <span class="o">*</span> <span class="n">Cw</span> <span class="o">-</span> <span class="n">Ch</span> <span class="o">*</span> <span class="n">Sw</span>
+    <span class="n">CC</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">C2</span> <span class="o">*</span> <span class="n">C2w</span> <span class="o">+</span> <span class="n">S2</span> <span class="o">*</span> <span class="n">S2w</span><span class="p">)</span>
+    <span class="n">SS</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">C2</span> <span class="o">*</span> <span class="n">C2w</span> <span class="o">-</span> <span class="n">S2</span> <span class="o">*</span> <span class="n">S2w</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fit_bias</span><span class="p">:</span>
+        <span class="n">CC</span> <span class="o">-=</span> <span class="p">(</span><span class="n">C</span> <span class="o">*</span> <span class="n">Cw</span> <span class="o">+</span> <span class="n">S</span> <span class="o">*</span> <span class="n">Sw</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">SS</span> <span class="o">-=</span> <span class="p">(</span><span class="n">S</span> <span class="o">*</span> <span class="n">Cw</span> <span class="o">-</span> <span class="n">C</span> <span class="o">*</span> <span class="n">Sw</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="c1"># Filter &quot;invalid value in divide&quot; warnings for zero-frequency</span>
+        <span class="k">if</span> <span class="n">fit_bias</span> <span class="ow">and</span> <span class="n">f0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+        <span class="n">power</span> <span class="o">=</span> <span class="p">(</span><span class="n">YC</span> <span class="o">*</span> <span class="n">YC</span> <span class="o">/</span> <span class="n">CC</span> <span class="o">+</span> <span class="n">YS</span> <span class="o">*</span> <span class="n">YS</span> <span class="o">/</span> <span class="n">SS</span><span class="p">)</span>
+
+        <span class="c1"># fix NaN and INF at zero frequency</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">power</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">power</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">power</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s1">&#39;normalized&#39;</span><span class="p">:</span>
+        <span class="n">power</span> <span class="o">/=</span> <span class="n">YY</span>
+    <span class="k">elif</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s1">&#39;unnormalized&#39;</span><span class="p">:</span>
+        <span class="n">power</span> <span class="o">*=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">t</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;normalization=&#39;{0}&#39; &quot;</span>
+                         <span class="s2">&quot;not recognized&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalization</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">power</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2016, Jake VanderPlas.<br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
+    Last built 06 Apr 2016. <br/>
+  </p>
+</footer>
+  </body>
+</html>

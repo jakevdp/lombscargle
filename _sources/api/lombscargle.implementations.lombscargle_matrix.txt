@@ -1,0 +1,8 @@
+
+
+lombscargle_matrix
+==============================================
+
+.. currentmodule:: lombscargle.implementations
+
+.. autofunction:: lombscargle_matrix
