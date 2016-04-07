@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev58</title>
+    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev61</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.dev58',
+        VERSION:     '0.1.dev61',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
-    <link rel="top" title="lombscargle v0.1.dev58" href="../index.html" />
+    <link rel="top" title="lombscargle v0.1.dev61" href="../index.html" />
     <link rel="next" title="LombScargle" href="../api/lombscargle.LombScargle.html" />
     <link rel="prev" title="Lomb-Scargle Periodograms in AstroPy" href="../index.html" />
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
@@ -68,7 +68,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">lombscargle v0.1.dev58</a>
+	<a href="../index.html">lombscargle v0.1.dev61</a>
 	 &raquo;
       </li>
       
@@ -240,16 +240,35 @@ the required number of grid points will scale linearly with the size of the
 baseline.</p>
 </div>
 </div>
+<div class="section" id="the-lomb-scargle-model">
+<h3>The Lomb-Scargle Model<a class="headerlink" href="#the-lomb-scargle-model" title="Permalink to this headline">¶</a></h3>
+<p>Under the hood, the Lomb-Scargle periodogram essentially fits a sinusoidal
+model to the data at each frequency, with a larger power reflecting a better
+fit. With this in mind, it is often helpful to plot the best-fit sinusoid
+over the phased data.</p>
+<p>This best-fit sinusoid can be computed using the <code class="docutils literal"><span class="pre">model</span></code> method of the
+<a class="reference internal" href="../api/lombscargle.LombScargle.html#lombscargle.LombScargle" title="lombscargle.LombScargle"><code class="xref py py-class docutils literal"><span class="pre">LombScargle</span></code></a> object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">best_frequency</span> <span class="o">=</span> <span class="n">frequency</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">power</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_fit</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">t_fit</span><span class="p">,</span> <span class="n">best_frequency</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can then phase the data and plot the Lomb-Scargle model fit:</p>
+<p>(<a class="reference external" href="../lombscargle/index-4.py">Source code</a>, <a class="reference external" href="../lombscargle/index-4.png">png</a>, <a class="reference external" href="../lombscargle/index-4.hires.png">hires.png</a>, <a class="reference external" href="../lombscargle/index-4.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/index-4.png" src="../_images/index-4.png" />
+</div>
+</div>
 </div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>An example of computing the periodogram for a more realistic dataset is
 shown in the following figure. The simulated data here consist of
-50 nightly observations of an RR Lyrae-like variable star,
+50 nightly observations of a vaguely RR Lyrae-like variable star,
 with lightcurve shape that is more complicated than a simple sine wave:</p>
-<p>(<a class="reference external" href="../lombscargle/index-4.py">Source code</a>, <a class="reference external" href="../lombscargle/index-4.png">png</a>, <a class="reference external" href="../lombscargle/index-4.hires.png">hires.png</a>, <a class="reference external" href="../lombscargle/index-4.pdf">pdf</a>)</p>
+<p>(<a class="reference external" href="../lombscargle/index-5.py">Source code</a>, <a class="reference external" href="../lombscargle/index-5.png">png</a>, <a class="reference external" href="../lombscargle/index-5.hires.png">hires.png</a>, <a class="reference external" href="../lombscargle/index-5.pdf">pdf</a>)</p>
 <div class="figure">
-<img alt="../_images/index-4.png" src="../_images/index-4.png" />
+<img alt="../_images/index-5.png" src="../_images/index-5.png" />
 </div>
 <p>This example demonstrates that for irregularly-sampled data,
 the Lomb-Scargle periodogram can be sensitive to frequencies higher
@@ -394,6 +413,7 @@ Time Series&#8221;. ApJ 812.1:18 (2015)</td></tr>
 <li><a class="reference internal" href="#frequency-grid-spacing">Frequency Grid Spacing</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#the-lomb-scargle-model">The Lomb-Scargle Model</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#example">Example</a></li>
