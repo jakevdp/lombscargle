@@ -118,7 +118,7 @@ Alternatively, we can use the ``power()`` method to evaluate the periodogram
 at a user-specified set of frequencies:
 
 >>> frequency = np.linspace(0.5, 1.5, 1000)
->>> power = LombScargle(t, y, dy).power(freqency)
+>>> power = LombScargle(t, y, dy).power(frequency)
 
 Note that the fastest Lomb-Scargle implementation requires regularly-spaced
 frequencies; if frequencies are irregularly-spaced, a slower method will be
