@@ -79,19 +79,17 @@ def periodic_fit(t, y, dy, frequency, t_fit,
     assert t_fit.ndim == 1
     assert np.isscalar(frequency)
 
-    w = dy ** -2.0
-    w /= w.sum()
-
     if center_data:
-        yw = (y - np.dot(w, y)) / dy
+        w = dy ** -2.0
+        y_mean = np.dot(y, w) / w.sum()
+        y = (y - y_mean)
     else:
-        yw = y / dy
-    chi2_ref = np.dot(yw, yw)
+        y_mean = 0
 
     X = design_matrix(t, frequency, dy=dy, bias=fit_bias, nterms=nterms)
     theta_MLE = np.linalg.solve(np.dot(X.T, X),
-                                np.dot(X.T, yw))
+                                np.dot(X.T, y / dy))
 
     X_fit = design_matrix(t_fit, frequency, bias=fit_bias, nterms=nterms)
 
-    return np.dot(X_fit, theta_MLE)
+    return y_mean + np.dot(X_fit, theta_MLE)

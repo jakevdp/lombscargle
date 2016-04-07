@@ -38,7 +38,7 @@ def test_multiterm_design_matrix(t, nterms):
 @pytest.mark.parametrize('nterms', range(1, 4))
 @pytest.mark.parametrize('freq', [1, 2])
 @pytest.mark.parametrize('fit_bias', [True, False])
-def test_mle_fit(nterms, freq, fit_bias):
+def test_exact_mle_fit(nterms, freq, fit_bias):
     rand = np.random.RandomState(42)
     t = 10 * rand.rand(30)
     theta = -1 + rand.rand(2 * nterms + 1)
