@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev57</title>
+    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev58</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.dev57',
+        VERSION:     '0.1.dev58',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
-    <link rel="top" title="lombscargle v0.1.dev57" href="../index.html" />
+    <link rel="top" title="lombscargle v0.1.dev58" href="../index.html" />
     <link rel="next" title="LombScargle" href="../api/lombscargle.LombScargle.html" />
     <link rel="prev" title="Lomb-Scargle Periodograms in AstroPy" href="../index.html" />
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
@@ -68,7 +68,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">lombscargle v0.1.dev57</a>
+	<a href="../index.html">lombscargle v0.1.dev58</a>
 	 &raquo;
       </li>
       
@@ -84,12 +84,14 @@
             
   <div class="section" id="lomb-scargle-periodograms-lombscargle">
 <span id="lombscargle"></span><h1>Lomb-Scargle Periodograms (<code class="docutils literal"><span class="pre">lombscargle</span></code>)<a class="headerlink" href="#lomb-scargle-periodograms-lombscargle" title="Permalink to this headline">¶</a></h1>
-<p>The Lomb-Scargle Periodogram (after Lomb <a class="footnote-reference" href="#id4" id="id1">[1]</a>, and Scargle <a class="footnote-reference" href="#id5" id="id2">[2]</a>)
+<p>The Lomb-Scargle Periodogram (after Lomb <a class="footnote-reference" href="#id6" id="id1">[1]</a>, and Scargle <a class="footnote-reference" href="#id7" id="id2">[2]</a>)
 is a commonly-used statistical tool designed to detect periodic signals
 in unevenly-spaced observations.
 The <code class="docutils literal"><span class="pre">lombscargle</span></code> package contains a unified interface to several
 implementations of the Lomb-Scargle periodogram, including a fast <em>O[NlogN]</em>
-implementation following the algorithm presented by Press &amp; Rybicki <a class="footnote-reference" href="#id6" id="id3">[3]</a>.</p>
+implementation following the algorithm presented by Press &amp; Rybicki <a class="footnote-reference" href="#id8" id="id3">[3]</a>.</p>
+<p>The code here is adapted from the [gatspy](<a class="reference external" href="http://astroml.org/gatspy">http://astroml.org/gatspy</a>) package,
+described in <a class="footnote-reference" href="#id9" id="id4">[4]</a> and <a class="footnote-reference" href="#id10" id="id5">[5]</a>.</p>
 <div class="section" id="quick-start-guide">
 <h2>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this headline">¶</a></h2>
 <p>The simplest usage of the Lomb-Scargle tool is via the
@@ -257,14 +259,14 @@ relatively cleanly reveals the true period of 0.4 days.</p>
 </div>
 <div class="section" id="literature-references">
 <h2>Literature References<a class="headerlink" href="#literature-references" title="Permalink to this headline">¶</a></h2>
-<table class="docutils footnote" frame="void" id="id4" rules="none">
+<table class="docutils footnote" frame="void" id="id6" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Lomb, N.R. &#8220;Least-squares frequency analysis of unequally spaced data&#8221;.
 Ap&amp;SS 39 pp. 447-462 (1976)</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id5" rules="none">
+<table class="docutils footnote" frame="void" id="id7" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Scargle, J. D. &#8220;Studies in astronomical time series analysis. II -
@@ -272,11 +274,25 @@ Statistical aspects of spectral analysis of unevenly spaced data&#8221;.
 ApJ 1:263 pp. 835-853 (1982)</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id6" rules="none">
+<table class="docutils footnote" frame="void" id="id8" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>Press W.H. and Rybicki, G.B, &#8220;Fast algorithm for spectral analysis
 of unevenly sampled data&#8221;. ApJ 1:338, p. 277 (1989)</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>VanderPlas, J. &#8220;Gatspy: General Tools for Astronomical Time Series
+in Python&#8221; (2015) <a class="reference external" href="http://dx.doi.org/10.5281/zenodo.14833">http://dx.doi.org/10.5281/zenodo.14833</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[5]</a></td><td>VanderPlas, J. &amp; Ivezic, Z. &#8220;Periodograms for Multiband Astronomical
+Time Series&#8221;. ApJ 812.1:18 (2015)</td></tr>
 </tbody>
 </table>
 </div>
@@ -284,8 +300,8 @@ of unevenly sampled data&#8221;. ApJ 1:338, p. 277 (1989)</td></tr>
 <h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="module-lombscargle">
 <span id="lombscargle-package"></span><h3>lombscargle Package<a class="headerlink" href="#module-lombscargle" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id7">
-<h4>lombscargle<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id11">
+<h4>lombscargle<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
 <p>AstroPy-compatible implementation of the Lomb-Scargle periodogram.</p>
 </div>
 <div class="section" id="classes">
@@ -342,8 +358,8 @@ of unevenly sampled data&#8221;. ApJ 1:338, p. 277 (1989)</td></tr>
 </div>
 <div class="section" id="module-lombscargle.heuristics">
 <span id="lombscargle-heuristics-module"></span><h3>lombscargle.heuristics Module<a class="headerlink" href="#module-lombscargle.heuristics" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id8">
-<h4>Functions<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id12">
+<h4>Functions<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
@@ -384,7 +400,7 @@ of unevenly sampled data&#8221;. ApJ 1:338, p. 277 (1989)</td></tr>
 <li><a class="reference internal" href="#literature-references">Literature References</a></li>
 <li><a class="reference internal" href="#api-reference">API Reference</a><ul>
 <li><a class="reference internal" href="#module-lombscargle">lombscargle Package</a><ul>
-<li><a class="reference internal" href="#id7">lombscargle</a></li>
+<li><a class="reference internal" href="#id11">lombscargle</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
@@ -394,7 +410,7 @@ of unevenly sampled data&#8221;. ApJ 1:338, p. 277 (1989)</td></tr>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-lombscargle.heuristics">lombscargle.heuristics Module</a><ul>
-<li><a class="reference internal" href="#id8">Functions</a></li>
+<li><a class="reference internal" href="#id12">Functions</a></li>
 </ul>
 </li>
 </ul>
