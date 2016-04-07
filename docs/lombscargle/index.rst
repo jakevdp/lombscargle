@@ -93,7 +93,7 @@ the Lomb-Scargle power *P* is a dimensionless quantity satisfying *0 ≤ P ≤ 1
 Specifying the Frequency
 ------------------------
 With the ``autopower()`` method used above, a heuristic is applied to select
-a valid frequency grid. By default, the heuristic assumes that the width of
+a suitable frequency grid. By default, the heuristic assumes that the width of
 peaks is inversely proportional to the observation baseline, and that the
 maximum frequency is a factor of 5 larger than the so-called "average Nyquist
 frequency", computed based on the average observation spacing.
@@ -105,14 +105,14 @@ For this reason, the heuristic can be tuned through keywords passed to the
 
 >>> frequency, power = LombScargle(t, y, dy).autopower(nyquist_factor=2)
 >>> len(frequency), frequency.min(), frequency.max()
-(500, 0.0010260648866521115, 1.0250388217654594)
+(500, 0.0010189890448009111, 1.0179700557561102)
 
 Here the highest frequency is two times the average Nyquist frequency.
 If we increase the ``nyquist_factor``, we can probe higher frequencies:
 
 >>> frequency, power = LombScargle(t, y, dy).autopower(nyquist_factor=10)
 >>> len(frequency), frequency.min(), frequency.max()
-(2500, 0.0010260648866521115, 5.1292983683739051)
+(2500, 0.0010189890448009111, 5.0939262349597545)
 
 Alternatively, we can use the ``power()`` method to evaluate the periodogram
 at a user-specified set of frequencies:
@@ -121,7 +121,8 @@ at a user-specified set of frequencies:
 >>> power = LombScargle(t, y, dy).power(freqency)
 
 Note that the fastest Lomb-Scargle implementation requires regularly-spaced
-frequencies, so it is best.
+frequencies; if frequencies are irregularly-spaced, a slower method will be
+used instead.
 
 Frequency Grid Spacing
 ^^^^^^^^^^^^^^^^^^^^^^
