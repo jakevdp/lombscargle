@@ -3,10 +3,10 @@
 """
 lombscargle
 ===========
-AstroPy-compatible implementation of the classic lomb-scargle periodogram.
+AstroPy-compatible implementation of the Lomb-Scargle periodogram.
 """
 
-__all__ = ['lombscargle', 'LombScargle']
+__all__ = ['LombScargle']
 
 # Affiliated packages may add whatever they like to this file, but
 # should keep this content at the top.
@@ -17,4 +17,3 @@ from ._astropy_init import *
 # For egg_info test builds to pass, put package imports here.
 if not _ASTROPY_SETUP_:
     from ._lombscargle import LombScargle
-    from .implementations import lombscargle

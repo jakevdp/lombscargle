@@ -137,6 +137,21 @@ def _get_frequency_grid(frequency, assume_regular_frequency=False):
     return frequency[0], frequency[1] - frequency[0], len(frequency)
 
 
+def _is_regular(frequency, assume_regular_frequency=False):
+    if assume_regular_frequency:
+        return True
+
+    frequency = np.asarray(frequency)
+
+    if frequency.ndim != 1:
+        return False
+    elif len(frequency) == 1:
+        return True
+    else:
+        diff = frequency[1:] - frequency[:-1]
+        return np.allclose(diff[0], diff)
+
+
 def lombscargle(t, y, dy=None,
                 frequency=None,
                 method='auto',
@@ -207,8 +222,8 @@ def lombscargle(t, y, dy=None,
     frequency = frequency.ravel()
 
     if method == 'auto':
-        # TODO: make more careful choices here
-        if len(frequency) > 100:
+        if len(frequency) > 100 and _is_regular(frequency,
+                                                assume_regular_frequency):
             method = 'fast'
         elif dy is None and not fit_bias:
             method = 'scipy'

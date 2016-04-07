@@ -70,6 +70,30 @@ class LombScargle(object):
         self.fit_bias = fit_bias
         self.center_data = center_data
 
+    @classmethod
+    def autofrequency(cls, t, heuristic='baseline', **kwds):
+        """Determine a suitable frequency grid for data
+
+        Parameters
+        ----------
+        t : array_like or Quantity
+            The sampling times of the data
+        heuristic : string
+            The type of heuristic to use. Currently only 'baseline' is
+            supported
+        **kwargs :
+            additional keyword arguments will be passed to the frequency
+            heuristic.
+
+        Returns
+        -------
+        frequency : ndarray or Quantity
+            The heuristically-determined optimal frequency bin
+        """
+        t = np.asanyarray(t)
+        heuristic = get_heuristic(heuristic)
+        return heuristic(n_samples=len(t), baseline=t.max() - t.min(), **kwds)
+
     def autopower(self, frequency_heuristic='baseline',
                   method='auto', method_kwds=None,
                   normalization='normalized',**kwargs):
@@ -107,10 +131,8 @@ class LombScargle(object):
         frequency, power : ndarrays
             The frequency and Lomb-Scargle power
         """
-        heuristic = get_heuristic(frequency_heuristic)
-        frequency = heuristic(n_samples=len(self.t),
-                              baseline=self.t.max() - self.t.min(),
-                              **kwargs)
+        frequency = self.autofrequency(self.t, frequency_heuristic, **kwargs)
+
         power = lombscargle(self.t, self.y, self.dy,
                             frequency=frequency,
                             center_data=self.center_data,
