@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev61</title>
+    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev63</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.dev61',
+        VERSION:     '0.1.dev63',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
-    <link rel="top" title="lombscargle v0.1.dev61" href="../index.html" />
+    <link rel="top" title="lombscargle v0.1.dev63" href="../index.html" />
     <link rel="next" title="LombScargle" href="../api/lombscargle.LombScargle.html" />
     <link rel="prev" title="Lomb-Scargle Periodograms in AstroPy" href="../index.html" />
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
@@ -68,7 +68,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">lombscargle v0.1.dev61</a>
+	<a href="../index.html">lombscargle v0.1.dev63</a>
 	 &raquo;
       </li>
       
@@ -104,8 +104,9 @@ For example, consider the following data:</p>
 </pre></div>
 </div>
 <p>These are 100 noisy measurements taken at irregular times, with a frequency
-of 1. The Lomb-Scargle periodogram, with frequency automatically chosen based
-on the input data, can be computed as follows:</p>
+of 1 cycle per unit time.
+The Lomb-Scargle periodogram, evaluated at frequencies chosen
+automatically based on the input data, can be computed as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lombscargle</span> <span class="kn">import</span> <span class="n">LombScargle</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">()</span>
 </pre></div>
@@ -123,7 +124,7 @@ on the input data, can be computed as follows:</p>
 from the data we constructed.</p>
 <div class="section" id="measurement-uncertainties">
 <h3>Measurement Uncertainties<a class="headerlink" href="#measurement-uncertainties" title="Permalink to this headline">¶</a></h3>
-<p>The periodogram also can handle data with measurement uncertainties.
+<p>The periodogram implementation can also handle data with measurement uncertainties.
 For example, if all uncertainties are the same, you can pass a scalar:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dy</span> <span class="o">=</span> <span class="mf">0.1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">()</span>
@@ -274,7 +275,9 @@ with lightcurve shape that is more complicated than a simple sine wave:</p>
 the Lomb-Scargle periodogram can be sensitive to frequencies higher
 than the average Nyquist frequency: the above data are sampled at
 an average rate of roughly one per day, and the periodogram
-relatively cleanly reveals the true period of 0.4 days.</p>
+relatively cleanly reveals the true period of 0.4 days, though there
+are aliases due to the interaction between the 0.4-day signal and the
+roughly 1.0-day observing window.</p>
 </div>
 <div class="section" id="literature-references">
 <h2>Literature References<a class="headerlink" href="#literature-references" title="Permalink to this headline">¶</a></h2>
@@ -357,7 +360,7 @@ Time Series&#8221;. ApJ 812.1:18 (2015)</td></tr>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle.html#lombscargle.implementations.lombscargle" title="lombscargle.implementations.lombscargle"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle</span></code></a>(t,&nbsp;y[,&nbsp;dy,&nbsp;frequency,&nbsp;method,&nbsp;...])</td>
-<td>Compute the Lomb-scargle Periodogram</td>
+<td>Compute the Lomb-scargle Periodogram with a given method.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_fast.html#lombscargle.implementations.lombscargle_fast" title="lombscargle.implementations.lombscargle_fast"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_fast</span></code></a>(t,&nbsp;y,&nbsp;dy,&nbsp;f0,&nbsp;df,&nbsp;Nf[,&nbsp;...])</td>
 <td>Fast Lomb-Scargle Periodogram</td>
@@ -453,7 +456,7 @@ Time Series&#8221;. ApJ 812.1:18 (2015)</td></tr>
   <p>
     &copy; Copyright 2016, Jake VanderPlas.<br/>
     Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
-    Last built 07 Apr 2016. <br/>
+    Last built 11 Apr 2016. <br/>
   </p>
 </footer>
   </body>

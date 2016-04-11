@@ -29,8 +29,9 @@ For example, consider the following data::
     >>> y = np.sin(2 * np.pi * t) + 0.1 * rand.randn(100)
 
 These are 100 noisy measurements taken at irregular times, with a frequency
-of 1. The Lomb-Scargle periodogram, with frequency automatically chosen based
-on the input data, can be computed as follows::
+of 1 cycle per unit time.
+The Lomb-Scargle periodogram, evaluated at frequencies chosen
+automatically based on the input data, can be computed as follows::
 
    >>> from lombscargle import LombScargle
    >>> frequency, power = LombScargle(t, y).autopower()
@@ -61,7 +62,7 @@ from the data we constructed.
 Measurement Uncertainties
 -------------------------
 
-The periodogram also can handle data with measurement uncertainties.
+The periodogram implementation can also handle data with measurement uncertainties.
 For example, if all uncertainties are the same, you can pass a scalar:
 
 >>> dy = 0.1
@@ -341,7 +342,9 @@ This example demonstrates that for irregularly-sampled data,
 the Lomb-Scargle periodogram can be sensitive to frequencies higher
 than the average Nyquist frequency: the above data are sampled at
 an average rate of roughly one per day, and the periodogram
-relatively cleanly reveals the true period of 0.4 days.
+relatively cleanly reveals the true period of 0.4 days, though there
+are aliases due to the interaction between the 0.4-day signal and the
+roughly 1.0-day observing window.
 
 
 Literature References
