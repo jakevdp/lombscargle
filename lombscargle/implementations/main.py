@@ -160,7 +160,7 @@ def lombscargle(t, y, dy=None,
                 fit_bias=True, center_data=True,
                 method_kwds=None):
     """
-    Compute the Lomb-scargle Periodogram
+    Compute the Lomb-scargle Periodogram with a given method.
 
     Parameters
     ----------
