@@ -46,7 +46,7 @@ def lombscargle_fastmatrix(t, y, dy, frequency, normalization='normalized',
     .. [1] M. Zechmeister and M. Kurster, A&A 496, 577-584 (2009)
     .. [2] W. Press et al, Numerical Recipies in C (2002)
     .. [3] Scargle, J.D. ApJ 263:835-853 (1982)
-    .. [4] Palmer, J. ApJ 695:496–502 (2009)
+    .. [4] Palmer, J. ApJ 695:496-502 (2009)
     """
     if nterms == 0 and not fit_bias:
         raise ValueError("Cannot have nterms = 0 without fitting bias")
