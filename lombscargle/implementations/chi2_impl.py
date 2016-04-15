@@ -5,11 +5,11 @@ import numpy as np
 from .mle import design_matrix
 
 
-def lombscargle_matrix(t, y, dy, frequency, normalization='normalized',
-                       fit_bias=True, center_data=True, nterms=1):
+def lombscargle_chi2(t, y, dy, frequency, normalization='normalized',
+                     fit_bias=True, center_data=True, nterms=1):
     """Lomb-Scargle Periodogram
 
-    This implements a matrix-based periodogram, which is relatively slow but
+    This implements a chi-squared-based periodogram, which is relatively slow but
     useful for validating the faster algorithms in the package.
 
     Parameters

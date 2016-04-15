@@ -1,8 +1,8 @@
 """Various implementations of the Lomb-Scargle Periodogram"""
 
 from .main import lombscargle
-from .matrix_impl import lombscargle_matrix
+from .chi2_impl import lombscargle_chi2
 from .scipy_impl import lombscargle_scipy
 from .slow_impl import lombscargle_slow
 from .fast_impl import lombscargle_fast
-from .fastmatrix_impl import lombscargle_fastmatrix
+from .fastchi2_impl import lombscargle_fastchi2

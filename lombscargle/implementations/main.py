@@ -11,15 +11,15 @@ from astropy.utils.compat.numpy import broadcast_arrays
 from .slow_impl import lombscargle_slow
 from .fast_impl import lombscargle_fast
 from .scipy_impl import lombscargle_scipy
-from .matrix_impl import lombscargle_matrix
-from .fastmatrix_impl import lombscargle_fastmatrix
+from .chi2_impl import lombscargle_chi2
+from .fastchi2_impl import lombscargle_fastchi2
 
 
 METHODS = {'slow': lombscargle_slow,
            'fast': lombscargle_fast,
-           'matrix': lombscargle_matrix,
+           'chi2': lombscargle_chi2,
            'scipy': lombscargle_scipy,
-           'fastmatrix': lombscargle_fastmatrix}
+           'fastchi2': lombscargle_fastchi2}
 
 
 def _validate_inputs(t, y, dy=None, frequency=None, strip_units=True):
@@ -186,7 +186,10 @@ def lombscargle(t, y, dy=None,
           evenly-spaced frequencies: by default this will be checked unless
           `assume_regular_frequency` is set to True.
         - `slow`: use the O[N^2] pure-python implementation
-        - `matrix`: use the O[N^2] matrix/linear-fitting implementation
+        - `chi2`: use the O[N^2] chi2/linear-fitting implementation
+        - `fastchi2`: use the O[N log N] chi2 implementation. Note that this
+          requires evenly-spaced frequencies: by default this will be checked
+          unless `assume_regular_frequency` is set to True.
         - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]
           implementation written in C. Note that this does not support
           heteroskedastic errors.
@@ -231,9 +234,9 @@ def lombscargle(t, y, dy=None,
         if nterms != 1:
             if len(frequency) > 100 and _is_regular(frequency,
                                                     assume_regular_frequency):
-                method = 'fastmatrix'
+                method = 'fastchi2'
             else:
-                method = 'matrix'
+                method = 'chi2'
         elif len(frequency) > 100 and _is_regular(frequency,
                                                   assume_regular_frequency):
             method = 'fast'
@@ -268,11 +271,11 @@ def lombscargle(t, y, dy=None,
                                          assume_regular_frequency)
         kwds.update(f0=f0, df=df, Nf=Nf)
 
-    # only matrix methods support nterms
-    if not method.endswith('matrix'):
+    # only chi2 methods support nterms
+    if not method.endswith('chi2'):
         if kwds.pop('nterms') != 1:
-            raise ValueError("nterms != 1 only supported with 'matrix' "
-                             "or 'fastmatrix' methods")
+            raise ValueError("nterms != 1 only supported with 'chi2' "
+                             "or 'fastchi2' methods")
 
     PLS = METHODS[method](*args, **kwds)
     return PLS.reshape(output_shape) * unit_dict['power']

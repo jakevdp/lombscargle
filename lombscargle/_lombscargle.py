@@ -112,7 +112,10 @@ class LombScargle(object):
               evenly-spaced frequencies: by default this will be checked unless
               `assume_regular_frequency` is set to True.
             - `slow`: use the O[N^2] pure-python implementation
-            - `matrix`: use the O[N^2] matrix/linear-fitting implementation
+            - `chi2`: use the O[N^2] chi2/linear-fitting implementation
+            - `fastchi2`: use the O[N log N] chi2 implementation. Note that this
+              requires evenly-spaced frequencies: by default this will be checked
+              unless `assume_regular_frequency` is set to True.
             - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]
               implementation written in C. Note that this does not support
               heteroskedastic errors.
@@ -160,7 +163,10 @@ class LombScargle(object):
               evenly-spaced frequencies: by default this will be checked unless
               `assume_regular_frequency` is set to True.
             - `slow`: use the O[N^2] pure-python implementation
-            - `matrix`: use the O[N^2] matrix/linear-fitting implementation
+            - `chi2`: use the O[N^2] chi2/linear-fitting implementation
+            - `fastchi2`: use the O[N log N] chi2 implementation. Note that this
+              requires evenly-spaced frequencies: by default this will be checked
+              unless `assume_regular_frequency` is set to True.
             - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]
               implementation written in C. Note that this does not support
               heteroskedastic errors.

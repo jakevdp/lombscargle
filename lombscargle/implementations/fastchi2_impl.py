@@ -3,16 +3,16 @@ from __future__ import print_function, division
 import numpy as np
 
 from .utils import trig_sum
-from .mle import design_matrix
 
 
-def lombscargle_fastmatrix(t, y, dy, f0, df, Nf, normalization='normalized',
-                           fit_bias=True, center_data=True, nterms=1,
-                           use_fft=True, trig_sum_kwds=None):
+def lombscargle_fastchi2(t, y, dy, f0, df, Nf, normalization='normalized',
+                         fit_bias=True, center_data=True, nterms=1,
+                         use_fft=True, trig_sum_kwds=None):
     """Lomb-Scargle Periodogram
 
-    This implements a fast matrix-based periodogram using the Fast-chi-square
-    algorithm outlined in [4]_. The key advantage of this algorithm is the
+    This implements a fast chi-squared periodogram using the algorithm
+    outlined in [4]_. The result is identical to the stantard Lomb-Scargle
+    periodogram. The advantage of this algorithm is the
     ability to compute multiterm periodograms relatively quickly.
 
     Parameters

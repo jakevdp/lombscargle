@@ -9,7 +9,7 @@ from ..implementations import lombscargle_slow, lombscargle
 
 from ..heuristics import baseline_heuristic
 
-METHOD_NAMES = ['auto', 'fast', 'slow', 'scipy', 'matrix']
+METHOD_NAMES = ['auto', 'fast', 'slow', 'scipy', 'chi2', 'fastchi2']
 
 
 @pytest.fixture
@@ -96,7 +96,7 @@ def test_common_interface(method, center_data, freq, data):
     PLS = lombscargle(t, y, frequency=freq, method=method,
                       fit_bias=False, center_data=center_data)
 
-    if method in ['fast', 'auto']:
+    if method in ['fastchi2', 'fast', 'auto']:
         atol = 0.005
     else:
         atol = 0

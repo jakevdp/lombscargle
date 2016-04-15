@@ -6,10 +6,10 @@ from functools import partial
 from .. import lombscargle
 
 
-ALL_METHODS = ['auto', 'slow', 'fast', 'scipy', 'matrix', 'fastmatrix']
-BIAS_METHODS = ['auto', 'slow', 'fast', 'matrix', 'fastmatrix']
-NTERMS_METHODS = ['auto', 'matrix', 'fastmatrix']
-FAST_METHODS = ['fast', 'fastmatrix']
+ALL_METHODS = ['auto', 'slow', 'fast', 'scipy', 'chi2', 'fastchi2']
+BIAS_METHODS = ['auto', 'slow', 'fast', 'chi2', 'fastchi2']
+NTERMS_METHODS = ['auto', 'chi2', 'fastchi2']
+FAST_METHODS = ['fast', 'fastchi2']
 
 
 @pytest.fixture
