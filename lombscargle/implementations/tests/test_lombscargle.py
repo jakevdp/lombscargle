@@ -99,21 +99,20 @@ def test_lombscargle_nterms(method, center_data, fit_bias, with_errors, nterms,
 
 
 @pytest.mark.parametrize('method', FAST_METHODS)
-@pytest.mark.parametrize('center_data', [True])
+@pytest.mark.parametrize('center_data', [True, False])
 @pytest.mark.parametrize('fit_bias', [True, False])
 @pytest.mark.parametrize('with_errors', [True, False])
 @pytest.mark.parametrize('nterms', range(4))
-@pytest.mark.parametrize('normalization', ['normalized', 'unnormalized'])
 def test_fast_methods(method, center_data, fit_bias, with_errors,
-                      nterms, normalization, data):
+                      nterms, data):
+    # leave out normalization here because we judge via absolute tolerance
     t, y, dy = data
     if not with_errors:
         dy = None
 
-    freq = 0.8 + 0.005 * np.arange(100)
+    freq = 0.8 + 0.01 * np.arange(40)
 
     kwds = dict(method=method,
-                normalization=normalization,
                 center_data=center_data,
                 fit_bias=fit_bias,
                 nterms=nterms)
@@ -139,4 +138,4 @@ def test_fast_methods(method, center_data, fit_bias, with_errors,
 
     Pmax = output_slow.max()
 
-    assert_allclose(output_slow, output_fast, atol=Pmax * 1E-2)
+    assert_allclose(output_slow, output_fast, atol=0.008)
