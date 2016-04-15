@@ -81,9 +81,9 @@ def lombscargle_fastmatrix(t, y, dy, frequency, normalization='normalized',
 
     # Here we build-up the matrices XTX and XTy using pre-computed
     # sums. The relevant identities are
-    # 2 sin(mx) sin(nx) = cos(m−n)x − cos(m+n)x
-    # 2 cos(mx) cos(nx) = cos(m−n)x + cos(m+n)x
-    # 2 sin(mx) cos(nx) = sin(m−n)x + sin(m+n)x
+    # 2 sin(mx) sin(nx) = cos(m-n)x - cos(m+n)x
+    # 2 cos(mx) cos(nx) = cos(m-n)x + cos(m+n)x
+    # 2 sin(mx) cos(nx) = sin(m-n)x + sin(m+n)x
 
     yws = np.sum(y * w)
 

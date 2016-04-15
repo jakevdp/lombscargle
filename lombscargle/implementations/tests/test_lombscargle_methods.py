@@ -91,4 +91,4 @@ def test_lombscargle_methods_with_nterms(lombscargle_method, nterms,
                                          frequency=freq, **kwds)
 
     output = lombscargle_method(t, y, dy=None, frequency=freq, **kwds)
-    assert_allclose(output, expected_output, atol=1E-30)
+    assert_allclose(output, expected_output, atol=1E-20)
