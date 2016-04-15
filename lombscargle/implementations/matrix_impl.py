@@ -72,7 +72,7 @@ def lombscargle_matrix(t, y, dy, frequency, normalization='normalized',
     p = np.array([compute_power(f) for f in frequency])
 
     if normalization == 'unnormalized':
-        p *= 0.5
+        p *= 0.5 * t.size / (dy ** -2).sum()
     elif normalization == 'normalized':
         p /= chi2_ref
     else:

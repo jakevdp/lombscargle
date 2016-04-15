@@ -122,7 +122,7 @@ def lombscargle_fastmatrix(t, y, dy, frequency, normalization='normalized',
     p = np.array([compute_power(i) for i in range(Nf)])
 
     if normalization == 'unnormalized':
-        p *= 0.5
+        p *= 0.5 * t.size / ws
     elif normalization == 'normalized':
         p /= chi2_ref
     else:
