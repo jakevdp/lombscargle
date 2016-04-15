@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev63</title>
+    <title>Lomb-Scargle Periodograms (lombscargle) &mdash; lombscargle v0.1.dev72</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.dev63',
+        VERSION:     '0.1.dev72',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
-    <link rel="top" title="lombscargle v0.1.dev63" href="../index.html" />
-    <link rel="next" title="LombScargle" href="../api/lombscargle.LombScargle.html" />
+    <link rel="top" title="lombscargle v0.1.dev72" href="../index.html" />
+    <link rel="next" title="Quick Start Guide" href="quickstart.html" />
     <link rel="prev" title="Lomb-Scargle Periodograms in AstroPy" href="../index.html" />
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 <script type="text/javascript" src="../_static/copybutton.js"></script>
@@ -57,7 +57,7 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="../api/lombscargle.LombScargle.html" title="LombScargle">
+	<a href="quickstart.html" title="Quick Start Guide">
 	  next &raquo;
 	</a>
       </li>
@@ -68,7 +68,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">lombscargle v0.1.dev63</a>
+	<a href="../index.html">lombscargle v0.1.dev72</a>
 	 &raquo;
       </li>
       
@@ -92,192 +92,12 @@ implementations of the Lomb-Scargle periodogram, including a fast <em>O[NlogN]</
 implementation following the algorithm presented by Press &amp; Rybicki <a class="footnote-reference" href="#id8" id="id3">[3]</a>.</p>
 <p>The code here is adapted from the <a class="reference external" href="http://astroml.org/gatspy">gatspy</a> package,
 described in <a class="footnote-reference" href="#id9" id="id4">[4]</a> and <a class="footnote-reference" href="#id10" id="id5">[5]</a>.</p>
-<div class="section" id="quick-start-guide">
-<h2>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this headline">¶</a></h2>
-<p>The simplest usage of the Lomb-Scargle tool is via the
-<a class="reference internal" href="../api/lombscargle.LombScargle.html#lombscargle.LombScargle" title="lombscargle.LombScargle"><code class="xref py py-class docutils literal"><span class="pre">LombScargle</span></code></a> class.
-For example, consider the following data:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">rand</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">rand</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>These are 100 noisy measurements taken at irregular times, with a frequency
-of 1 cycle per unit time.
-The Lomb-Scargle periodogram, evaluated at frequencies chosen
-automatically based on the input data, can be computed as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lombscargle</span> <span class="kn">import</span> <span class="n">LombScargle</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Plotting the result with matplotlib gives:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>   
-</pre></div>
-</div>
-<p>(<a class="reference external" href="../lombscargle/index-1.py">Source code</a>, <a class="reference external" href="../lombscargle/index-1.png">png</a>, <a class="reference external" href="../lombscargle/index-1.hires.png">hires.png</a>, <a class="reference external" href="../lombscargle/index-1.pdf">pdf</a>)</p>
-<div class="figure">
-<img alt="../_images/index-1.png" src="../_images/index-1.png" />
-</div>
-<p>The periodogram shows a clear spike at a frequency of 1, as we would expect
-from the data we constructed.</p>
-<div class="section" id="measurement-uncertainties">
-<h3>Measurement Uncertainties<a class="headerlink" href="#measurement-uncertainties" title="Permalink to this headline">¶</a></h3>
-<p>The periodogram implementation can also handle data with measurement uncertainties.
-For example, if all uncertainties are the same, you can pass a scalar:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dy</span> <span class="o">=</span> <span class="mf">0.1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>If uncertainties vary from observation to observation, you can pass them as
-an array:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dy</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">rand</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">rand</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Gaussian uncertainties are assumed, and <code class="docutils literal"><span class="pre">dy</span></code> here specifies the standard
-deviation (not the variance).</p>
-</div>
-<div class="section" id="data-and-periodogram-units">
-<h3>Data and Periodogram Units<a class="headerlink" href="#data-and-periodogram-units" title="Permalink to this headline">¶</a></h3>
-<p>The code supports <a class="reference external" href="http://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v1.1.2)"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a> objects with units attached,
-and will validate the inputs to make sure units are appropriate. For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">astropy.units</span> <span class="kn">as</span> <span class="nn">u</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t_days</span> <span class="o">=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">day</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y_mags</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">mag</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dy_mags</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">mag</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t_days</span><span class="p">,</span> <span class="n">y_mags</span><span class="p">,</span> <span class="n">dy_mags</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="o">.</span><span class="n">unit</span>
-<span class="go">Unit(&quot;1 / d&quot;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span><span class="o">.</span><span class="n">unit</span>
-<span class="go">Unit(dimensionless)</span>
-</pre></div>
-</div>
-<p>Note that in the standard normalization, regardless of the units of the input,
-the Lomb-Scargle power <em>P</em> is a dimensionless quantity satisfying <em>0 ≤ P ≤ 1</em>.</p>
-</div>
-<div class="section" id="specifying-the-frequency">
-<h3>Specifying the Frequency<a class="headerlink" href="#specifying-the-frequency" title="Permalink to this headline">¶</a></h3>
-<p>With the <code class="docutils literal"><span class="pre">autopower()</span></code> method used above, a heuristic is applied to select
-a suitable frequency grid. By default, the heuristic assumes that the width of
-peaks is inversely proportional to the observation baseline, and that the
-maximum frequency is a factor of 5 larger than the so-called &#8220;average Nyquist
-frequency&#8221;, computed based on the average observation spacing.</p>
-<p>This heuristic is not universally useful, as the frequencies probed by
-irregularly-sampled data can be much higher than the average Nyquist frequency.
-For this reason, the heuristic can be tuned through keywords passed to the
-<a class="reference internal" href="../api/lombscargle.heuristics.baseline_heuristic.html#lombscargle.heuristics.baseline_heuristic" title="lombscargle.heuristics.baseline_heuristic"><code class="xref py py-func docutils literal"><span class="pre">baseline_heuristic()</span></code></a> function. For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">(</span><span class="n">nyquist_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">frequency</span><span class="p">),</span> <span class="n">frequency</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">frequency</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-<span class="go">(500, 0.0010189890448009111, 1.0179700557561102)</span>
-</pre></div>
-</div>
-<p>Here the highest frequency is two times the average Nyquist frequency.
-If we increase the <code class="docutils literal"><span class="pre">nyquist_factor</span></code>, we can probe higher frequencies:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">(</span><span class="n">nyquist_factor</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">frequency</span><span class="p">),</span> <span class="n">frequency</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">frequency</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-<span class="go">(2500, 0.0010189890448009111, 5.0939262349597545)</span>
-</pre></div>
-</div>
-<p>Alternatively, we can use the <code class="docutils literal"><span class="pre">power()</span></code> method to evaluate the periodogram
-at a user-specified set of frequencies:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Note that the fastest Lomb-Scargle implementation requires regularly-spaced
-frequencies; if frequencies are irregularly-spaced, a slower method will be
-used instead.</p>
-<div class="section" id="frequency-grid-spacing">
-<h4>Frequency Grid Spacing<a class="headerlink" href="#frequency-grid-spacing" title="Permalink to this headline">¶</a></h4>
-<p>One common issue with user-specified frequencies is choosing too coarse a
-grid, such that significant peaks lie between grid points and are missed
-entirely.</p>
-<p>For example, imagine you chose to evaluate your periodogram at 100 points:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>   
-</pre></div>
-</div>
-<p>(<a class="reference external" href="../lombscargle/index-2.py">Source code</a>, <a class="reference external" href="../lombscargle/index-2.png">png</a>, <a class="reference external" href="../lombscargle/index-2.hires.png">hires.png</a>, <a class="reference external" href="../lombscargle/index-2.pdf">pdf</a>)</p>
-<div class="figure">
-<img alt="../_images/index-2.png" src="../_images/index-2.png" />
-</div>
-<p>From this plot alone, one might conclude that no clear periodic signal exists
-in the data.
-But this conclusion is in error: there is in fact a strong periodic signal,
-but the periodogram peak falls in the gap between your grid points!</p>
-<p>A safer approach is to use the frequency heuristic to decide on the appropriate
-grid spacing to use, optionally passing a minimum and maximum frequency to
-the <code class="docutils literal"><span class="pre">autopower</span></code> method:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">(</span><span class="n">minimum_frequency</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">maximum_frequency</span><span class="o">=</span><span class="mf">1.9</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
-<span class="go">884</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span><span class="p">)</span>   
-</pre></div>
-</div>
-<p>(<a class="reference external" href="../lombscargle/index-3.py">Source code</a>, <a class="reference external" href="../lombscargle/index-3.png">png</a>, <a class="reference external" href="../lombscargle/index-3.hires.png">hires.png</a>, <a class="reference external" href="../lombscargle/index-3.pdf">pdf</a>)</p>
-<div class="figure">
-<img alt="../_images/index-3.png" src="../_images/index-3.png" />
-</div>
-<p>With a finer grid (here 884 points between 0.1 and 1.9),
-it is clear that there is a very strong periodic signal in the data.</p>
-<p>By default, the heuristic aims to have roughly five grid points across each
-significant periodogram peak; this can be increased by changing the
-<code class="docutils literal"><span class="pre">samples_per_peak</span></code> argument:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">(</span><span class="n">minimum_frequency</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">maximum_frequency</span><span class="o">=</span><span class="mf">1.9</span><span class="p">,</span>
-<span class="gp">... </span>                                                   <span class="n">samples_per_peak</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
-<span class="go">1767</span>
-</pre></div>
-</div>
-<p>Note that the width of the peak scales inversely with the baseline of the
-observations (i.e. the difference between the maximum and minimum time), and
-the required number of grid points will scale linearly with the size of the
-baseline.</p>
-</div>
-</div>
-<div class="section" id="the-lomb-scargle-model">
-<h3>The Lomb-Scargle Model<a class="headerlink" href="#the-lomb-scargle-model" title="Permalink to this headline">¶</a></h3>
-<p>Under the hood, the Lomb-Scargle periodogram essentially fits a sinusoidal
-model to the data at each frequency, with a larger power reflecting a better
-fit. With this in mind, it is often helpful to plot the best-fit sinusoid
-over the phased data.</p>
-<p>This best-fit sinusoid can be computed using the <code class="docutils literal"><span class="pre">model</span></code> method of the
-<a class="reference internal" href="../api/lombscargle.LombScargle.html#lombscargle.LombScargle" title="lombscargle.LombScargle"><code class="xref py py-class docutils literal"><span class="pre">LombScargle</span></code></a> object:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">best_frequency</span> <span class="o">=</span> <span class="n">frequency</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">power</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">t_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y_fit</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">t_fit</span><span class="p">,</span> <span class="n">best_frequency</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>We can then phase the data and plot the Lomb-Scargle model fit:</p>
-<p>(<a class="reference external" href="../lombscargle/index-4.py">Source code</a>, <a class="reference external" href="../lombscargle/index-4.png">png</a>, <a class="reference external" href="../lombscargle/index-4.hires.png">hires.png</a>, <a class="reference external" href="../lombscargle/index-4.pdf">pdf</a>)</p>
-<div class="figure">
-<img alt="../_images/index-4.png" src="../_images/index-4.png" />
-</div>
-</div>
-</div>
-<div class="section" id="example">
-<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>An example of computing the periodogram for a more realistic dataset is
-shown in the following figure. The simulated data here consist of
-50 nightly observations of a vaguely RR Lyrae-like variable star,
-with lightcurve shape that is more complicated than a simple sine wave:</p>
-<p>(<a class="reference external" href="../lombscargle/index-5.py">Source code</a>, <a class="reference external" href="../lombscargle/index-5.png">png</a>, <a class="reference external" href="../lombscargle/index-5.hires.png">hires.png</a>, <a class="reference external" href="../lombscargle/index-5.pdf">pdf</a>)</p>
-<div class="figure">
-<img alt="../_images/index-5.png" src="../_images/index-5.png" />
-</div>
-<p>This example demonstrates that for irregularly-sampled data,
-the Lomb-Scargle periodogram can be sensitive to frequencies higher
-than the average Nyquist frequency: the above data are sampled at
-an average rate of roughly one per day, and the periodogram
-relatively cleanly reveals the true period of 0.4 days, though there
-are aliases due to the interaction between the 0.4-day signal and the
-roughly 1.0-day observing window.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementations.html">Periodogram Implementations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
+</ul>
 </div>
 <div class="section" id="literature-references">
 <h2>Literature References<a class="headerlink" href="#literature-references" title="Permalink to this headline">¶</a></h2>
@@ -362,16 +182,19 @@ Time Series&#8221;. ApJ 812.1:18 (2015)</td></tr>
 <tr class="row-odd"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle.html#lombscargle.implementations.lombscargle" title="lombscargle.implementations.lombscargle"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle</span></code></a>(t,&nbsp;y[,&nbsp;dy,&nbsp;frequency,&nbsp;method,&nbsp;...])</td>
 <td>Compute the Lomb-scargle Periodogram with a given method.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_fast.html#lombscargle.implementations.lombscargle_fast" title="lombscargle.implementations.lombscargle_fast"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_fast</span></code></a>(t,&nbsp;y,&nbsp;dy,&nbsp;f0,&nbsp;df,&nbsp;Nf[,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_chi2.html#lombscargle.implementations.lombscargle_chi2" title="lombscargle.implementations.lombscargle_chi2"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_chi2</span></code></a>(t,&nbsp;y,&nbsp;dy,&nbsp;frequency[,&nbsp;...])</td>
+<td>Lomb-Scargle Periodogram</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_fast.html#lombscargle.implementations.lombscargle_fast" title="lombscargle.implementations.lombscargle_fast"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_fast</span></code></a>(t,&nbsp;y,&nbsp;dy,&nbsp;f0,&nbsp;df,&nbsp;Nf[,&nbsp;...])</td>
 <td>Fast Lomb-Scargle Periodogram</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_matrix.html#lombscargle.implementations.lombscargle_matrix" title="lombscargle.implementations.lombscargle_matrix"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_matrix</span></code></a>(t,&nbsp;y,&nbsp;dy,&nbsp;frequency[,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_fastchi2.html#lombscargle.implementations.lombscargle_fastchi2" title="lombscargle.implementations.lombscargle_fastchi2"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_fastchi2</span></code></a>(t,&nbsp;y,&nbsp;dy,&nbsp;f0,&nbsp;df,&nbsp;Nf[,&nbsp;...])</td>
 <td>Lomb-Scargle Periodogram</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_scipy.html#lombscargle.implementations.lombscargle_scipy" title="lombscargle.implementations.lombscargle_scipy"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_scipy</span></code></a>(t,&nbsp;y,&nbsp;dy,&nbsp;frequency[,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_scipy.html#lombscargle.implementations.lombscargle_scipy" title="lombscargle.implementations.lombscargle_scipy"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_scipy</span></code></a>(t,&nbsp;y,&nbsp;frequency[,&nbsp;...])</td>
 <td>Lomb-Scargle Periodogram</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_slow.html#lombscargle.implementations.lombscargle_slow" title="lombscargle.implementations.lombscargle_slow"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_slow</span></code></a>(t,&nbsp;y,&nbsp;dy,&nbsp;frequency[,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="../api/lombscargle.implementations.lombscargle_slow.html#lombscargle.implementations.lombscargle_slow" title="lombscargle.implementations.lombscargle_slow"><code class="xref py py-obj docutils literal"><span class="pre">lombscargle_slow</span></code></a>(t,&nbsp;y,&nbsp;dy,&nbsp;frequency[,&nbsp;...])</td>
 <td>Lomb-Scargle Periodogram</td>
 </tr>
 </tbody>
@@ -409,17 +232,6 @@ Time Series&#8221;. ApJ 812.1:18 (2015)</td></tr>
         <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
 <ul>
 <li><a class="reference internal" href="#">Lomb-Scargle Periodograms (<code class="docutils literal"><span class="pre">lombscargle</span></code>)</a><ul>
-<li><a class="reference internal" href="#quick-start-guide">Quick Start Guide</a><ul>
-<li><a class="reference internal" href="#measurement-uncertainties">Measurement Uncertainties</a></li>
-<li><a class="reference internal" href="#data-and-periodogram-units">Data and Periodogram Units</a></li>
-<li><a class="reference internal" href="#specifying-the-frequency">Specifying the Frequency</a><ul>
-<li><a class="reference internal" href="#frequency-grid-spacing">Frequency Grid Spacing</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#the-lomb-scargle-model">The Lomb-Scargle Model</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#example">Example</a></li>
 <li><a class="reference internal" href="#literature-references">Literature References</a></li>
 <li><a class="reference internal" href="#api-reference">API Reference</a><ul>
 <li><a class="reference internal" href="#module-lombscargle">lombscargle Package</a><ul>
@@ -456,7 +268,7 @@ Time Series&#8221;. ApJ 812.1:18 (2015)</td></tr>
   <p>
     &copy; Copyright 2016, Jake VanderPlas.<br/>
     Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
-    Last built 11 Apr 2016. <br/>
+    Last built 15 Apr 2016. <br/>
   </p>
 </footer>
   </body>

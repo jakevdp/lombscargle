@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lombscargle &mdash; lombscargle v0.1.dev63</title>
+    <title>lombscargle &mdash; lombscargle v0.1.dev72</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.dev63',
+        VERSION:     '0.1.dev72',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +25,9 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
-    <link rel="top" title="lombscargle v0.1.dev63" href="../index.html" />
+    <link rel="top" title="lombscargle v0.1.dev72" href="../index.html" />
     <link rel="up" title="Lomb-Scargle Periodograms (lombscargle)" href="../lombscargle/index.html" />
-    <link rel="next" title="lombscargle_fast" href="lombscargle.implementations.lombscargle_fast.html" />
+    <link rel="next" title="lombscargle_chi2" href="lombscargle.implementations.lombscargle_chi2.html" />
     <link rel="prev" title="LombScargle" href="lombscargle.LombScargle.html" />
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 <script type="text/javascript" src="../_static/copybutton.js"></script>
@@ -58,7 +58,7 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="lombscargle.implementations.lombscargle_fast.html" title="lombscargle_fast">
+	<a href="lombscargle.implementations.lombscargle_chi2.html" title="lombscargle_chi2">
 	  next &raquo;
 	</a>
       </li>
@@ -69,7 +69,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">lombscargle v0.1.dev63</a>
+	<a href="../index.html">lombscargle v0.1.dev72</a>
 	 &raquo;
       </li>
       <li><a href="../lombscargle/index.html" accesskey="U">Lomb-Scargle Periodograms (<code class="docutils literal"><span class="pre">lombscargle</span></code>)</a> &raquo;</li>
@@ -88,7 +88,7 @@
 <h1>lombscargle<a class="headerlink" href="#lombscargle" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="lombscargle.implementations.lombscargle">
-<code class="descclassname">lombscargle.implementations.</code><code class="descname">lombscargle</code><span class="sig-paren">(</span><em>t</em>, <em>y</em>, <em>dy=None</em>, <em>frequency=None</em>, <em>method='auto'</em>, <em>assume_regular_frequency=False</em>, <em>normalization='normalized'</em>, <em>fit_bias=True</em>, <em>center_data=True</em>, <em>method_kwds=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/implementations/main.py#L155" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/implementations/main.html#lombscargle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.implementations.lombscargle" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">lombscargle.implementations.</code><code class="descname">lombscargle</code><span class="sig-paren">(</span><em>t</em>, <em>y</em>, <em>dy=None</em>, <em>frequency=None</em>, <em>method='auto'</em>, <em>assume_regular_frequency=False</em>, <em>normalization='normalized'</em>, <em>fit_bias=True</em>, <em>center_data=True</em>, <em>method_kwds=None</em>, <em>nterms=1</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/implementations/main.py#L157" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/implementations/main.html#lombscargle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.implementations.lombscargle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the Lomb-scargle Periodogram with a given method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -123,7 +123,10 @@ use method=&#8217;fast&#8217;, frequencies must be regularly spaced.</p>
 evenly-spaced frequencies: by default this will be checked unless
 <code class="xref py py-obj docutils literal"><span class="pre">assume_regular_frequency</span></code> is set to True.</li>
 <li><code class="xref py py-obj docutils literal"><span class="pre">slow</span></code>: use the O[N^2] pure-python implementation</li>
-<li><code class="xref py py-obj docutils literal"><span class="pre">matrix</span></code>: use the O[N^2] matrix/linear-fitting implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">chi2</span></code>: use the O[N^2] chi2/linear-fitting implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">fastchi2</span></code>: use the O[N log N] chi2 implementation. Note that this
+requires evenly-spaced frequencies: by default this will be checked
+unless <code class="xref py py-obj docutils literal"><span class="pre">assume_regular_frequency</span></code> is set to True.</li>
 <li><code class="xref py py-obj docutils literal"><span class="pre">scipy</span></code>: use <code class="docutils literal"><span class="pre">scipy.signal.lombscargle</span></code>, which is an O[N^2]
 implementation written in C. Note that this does not support
 heteroskedastic errors.</li>
@@ -154,6 +157,11 @@ of the input data. This is especially important if <code class="xref py py-obj d
 <p><strong>method_kwds</strong> : dict (optional)</p>
 <blockquote>
 <div><p>additional keywords to pass to the lomb-scargle method</p>
+</div></blockquote>
+<p><strong>nterms</strong> : int (default=1)</p>
+<blockquote>
+<div><p>number of Fourier terms to use in the periodogram.
+Not supported with every method.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -193,7 +201,7 @@ of the input data. This is especially important if <code class="xref py py-obj d
   <p>
     &copy; Copyright 2016, Jake VanderPlas.<br/>
     Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
-    Last built 11 Apr 2016. <br/>
+    Last built 15 Apr 2016. <br/>
   </p>
 </footer>
   </body>

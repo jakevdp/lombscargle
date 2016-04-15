@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lombscargle_fast &mdash; lombscargle v0.1.dev63</title>
+    <title>lombscargle_fast &mdash; lombscargle v0.1.dev72</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.dev63',
+        VERSION:     '0.1.dev72',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,10 +25,10 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
-    <link rel="top" title="lombscargle v0.1.dev63" href="../index.html" />
+    <link rel="top" title="lombscargle v0.1.dev72" href="../index.html" />
     <link rel="up" title="Lomb-Scargle Periodograms (lombscargle)" href="../lombscargle/index.html" />
-    <link rel="next" title="lombscargle_matrix" href="lombscargle.implementations.lombscargle_matrix.html" />
-    <link rel="prev" title="lombscargle" href="lombscargle.implementations.lombscargle.html" />
+    <link rel="next" title="lombscargle_fastchi2" href="lombscargle.implementations.lombscargle_fastchi2.html" />
+    <link rel="prev" title="lombscargle_chi2" href="lombscargle.implementations.lombscargle_chi2.html" />
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 <script type="text/javascript" src="../_static/copybutton.js"></script>
 
@@ -58,18 +58,18 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="lombscargle.implementations.lombscargle_matrix.html" title="lombscargle_matrix">
+	<a href="lombscargle.implementations.lombscargle_fastchi2.html" title="lombscargle_fastchi2">
 	  next &raquo;
 	</a>
       </li>
       <li class="right">
-	<a href="lombscargle.implementations.lombscargle.html" title="lombscargle">
+	<a href="lombscargle.implementations.lombscargle_chi2.html" title="lombscargle_chi2">
 	  &laquo; previous
 	</a>
 	 |
       </li>
       <li>
-	<a href="../index.html">lombscargle v0.1.dev63</a>
+	<a href="../index.html">lombscargle v0.1.dev72</a>
 	 &raquo;
       </li>
       <li><a href="../lombscargle/index.html" accesskey="U">Lomb-Scargle Periodograms (<code class="docutils literal"><span class="pre">lombscargle</span></code>)</a> &raquo;</li>
@@ -90,7 +90,7 @@
 <dt id="lombscargle.implementations.lombscargle_fast">
 <code class="descclassname">lombscargle.implementations.</code><code class="descname">lombscargle_fast</code><span class="sig-paren">(</span><em>t</em>, <em>y</em>, <em>dy</em>, <em>f0</em>, <em>df</em>, <em>Nf</em>, <em>center_data=True</em>, <em>fit_bias=True</em>, <em>normalization='normalized'</em>, <em>use_fft=True</em>, <em>trig_sum_kwds=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/implementations/fast_impl.py#L9" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/implementations/fast_impl.html#lombscargle_fast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.implementations.lombscargle_fast" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fast Lomb-Scargle Periodogram</p>
-<p>This implements the Press &amp; Rybicki method <a class="reference internal" href="#r1" id="id1">[R1]</a> for fast O[N log(N)]
+<p>This implements the Press &amp; Rybicki method <a class="reference internal" href="#r4" id="id1">[R4]</a> for fast O[N log(N)]
 Lomb-Scargle periodograms.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -147,26 +147,26 @@ Lomb-Scargle periodogram, and as the number of points grows this
 approximation improves. On the other hand, for very small datasets
 (&lt;~50 points or so) this approximation may not be useful.</p>
 <p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="r1" rules="none">
+<table class="docutils citation" frame="void" id="r4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[R1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> Press W.H. and Rybicki, G.B, &#8220;Fast algorithm for spectral analysis
+<tr><td class="label">[R4]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> Press W.H. and Rybicki, G.B, &#8220;Fast algorithm for spectral analysis
 of unevenly sampled data&#8221;. ApJ 1:338, p277, 1989</td></tr>
 </tbody>
 </table>
-<table class="docutils citation" frame="void" id="r2" rules="none">
+<table class="docutils citation" frame="void" id="r5" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[R2]</a></td><td><ol class="first last upperalpha simple" start="13">
+<tr><td class="label"><a class="fn-backref" href="#id3">[R5]</a></td><td><ol class="first last upperalpha simple" start="13">
 <li>Zechmeister and M. Kurster, A&amp;A 496, 577-584 (2009)</li>
 </ol>
 </td></tr>
 </tbody>
 </table>
-<table class="docutils citation" frame="void" id="r3" rules="none">
+<table class="docutils citation" frame="void" id="r6" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id4">[R3]</a></td><td><ol class="first last upperalpha simple" start="23">
+<tr><td class="label"><a class="fn-backref" href="#id4">[R6]</a></td><td><ol class="first last upperalpha simple" start="23">
 <li>Press et al, Numerical Recipies in C (2002)</li>
 </ol>
 </td></tr>
@@ -200,7 +200,7 @@ of unevenly sampled data&#8221;. ApJ 1:338, p277, 1989</td></tr>
   <p>
     &copy; Copyright 2016, Jake VanderPlas.<br/>
     Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
-    Last built 11 Apr 2016. <br/>
+    Last built 15 Apr 2016. <br/>
   </p>
 </footer>
   </body>

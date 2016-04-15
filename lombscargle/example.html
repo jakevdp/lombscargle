@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Example &mdash; lombscargle v0.1.dev72</title>
+    
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.dev72',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="top" title="lombscargle v0.1.dev72" href="../index.html" />
+    <link rel="up" title="Lomb-Scargle Periodograms (lombscargle)" href="index.html" />
+    <link rel="next" title="LombScargle" href="../api/lombscargle.LombScargle.html" />
+    <link rel="prev" title="Periodogram Implementations" href="implementations.html" />
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+<script type="text/javascript" src="../_static/copybutton.js"></script>
+
+
+  </head>
+  <body role="document">
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">astro</span><span id="logotext2">py</span><span id="logotext3">:docs</span></a>
+  <ul>
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="../api/lombscargle.LombScargle.html" title="LombScargle">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="implementations.html" title="Periodogram Implementations">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">lombscargle v0.1.dev72</a>
+	 &raquo;
+      </li>
+      <li><a href="index.html" accesskey="U">Lomb-Scargle Periodograms (<code class="docutils literal"><span class="pre">lombscargle</span></code>)</a> &raquo;</li>
+      
+      <li>Example</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="example">
+<span id="lombscargle-example"></span><h1>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h1>
+<p>An example of computing the periodogram for a more realistic dataset is
+shown in the following figure. The simulated data here consist of
+50 nightly observations of a vaguely RR Lyrae-like variable star,
+with lightcurve shape that is more complicated than a simple sine wave:</p>
+<p>(<a class="reference external" href="../lombscargle/example-1.py">Source code</a>, <a class="reference external" href="../lombscargle/example-1.png">png</a>, <a class="reference external" href="../lombscargle/example-1.hires.png">hires.png</a>, <a class="reference external" href="../lombscargle/example-1.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/example-1.png" src="../_images/example-1.png" />
+</div>
+<p>This example demonstrates that for irregularly-sampled data,
+the Lomb-Scargle periodogram can be sensitive to frequencies higher
+than the average Nyquist frequency: the above data are sampled at
+an average rate of roughly one per day, and the periodogram
+relatively cleanly reveals the true period of 0.4 days, though there
+are aliases due to the interaction between the 0.4-day signal and the
+roughly 1.0-day observing window.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">Example</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="http://github.com/jakevdp/lombscargle/tree/master/docs/lombscargle/example.rst">Edit This Page on Github</a> &nbsp;
+    <a href="../_sources/lombscargle/example.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2016, Jake VanderPlas.<br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
+    Last built 15 Apr 2016. <br/>
+  </p>
+</footer>
+  </body>
+</html>

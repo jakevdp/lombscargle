@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>LombScargle &mdash; lombscargle v0.1.dev63</title>
+    <title>LombScargle &mdash; lombscargle v0.1.dev72</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1.dev63',
+        VERSION:     '0.1.dev72',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,10 +25,10 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
-    <link rel="top" title="lombscargle v0.1.dev63" href="../index.html" />
+    <link rel="top" title="lombscargle v0.1.dev72" href="../index.html" />
     <link rel="up" title="Lomb-Scargle Periodograms (lombscargle)" href="../lombscargle/index.html" />
     <link rel="next" title="lombscargle" href="lombscargle.implementations.lombscargle.html" />
-    <link rel="prev" title="Lomb-Scargle Periodograms (lombscargle)" href="../lombscargle/index.html" />
+    <link rel="prev" title="Example" href="../lombscargle/example.html" />
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 <script type="text/javascript" src="../_static/copybutton.js"></script>
 
@@ -63,13 +63,13 @@
 	</a>
       </li>
       <li class="right">
-	<a href="../lombscargle/index.html" title="Lomb-Scargle Periodograms (lombscargle)">
+	<a href="../lombscargle/example.html" title="Example">
 	  &laquo; previous
 	</a>
 	 |
       </li>
       <li>
-	<a href="../index.html">lombscargle v0.1.dev63</a>
+	<a href="../index.html">lombscargle v0.1.dev72</a>
 	 &raquo;
       </li>
       <li><a href="../lombscargle/index.html" accesskey="U">Lomb-Scargle Periodograms (<code class="docutils literal"><span class="pre">lombscargle</span></code>)</a> &raquo;</li>
@@ -235,7 +235,10 @@ observation baseline will drive the peak width.</p>
 evenly-spaced frequencies: by default this will be checked unless
 <code class="xref py py-obj docutils literal"><span class="pre">assume_regular_frequency</span></code> is set to True.</li>
 <li><code class="xref py py-obj docutils literal"><span class="pre">slow</span></code>: use the O[N^2] pure-python implementation</li>
-<li><code class="xref py py-obj docutils literal"><span class="pre">matrix</span></code>: use the O[N^2] matrix/linear-fitting implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">chi2</span></code>: use the O[N^2] chi2/linear-fitting implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">fastchi2</span></code>: use the O[N log N] chi2 implementation. Note that this
+requires evenly-spaced frequencies: by default this will be checked
+unless <code class="xref py py-obj docutils literal"><span class="pre">assume_regular_frequency</span></code> is set to True.</li>
 <li><code class="xref py py-obj docutils literal"><span class="pre">scipy</span></code>: use <code class="docutils literal"><span class="pre">scipy.signal.lombscargle</span></code>, which is an O[N^2]
 implementation written in C. Note that this does not support
 heteroskedastic errors.</li>
@@ -269,7 +272,7 @@ heuristic.</p>
 
 <dl class="method">
 <dt id="lombscargle.LombScargle.model">
-<code class="descname">model</code><span class="sig-paren">(</span><em>t</em>, <em>frequency</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/_lombscargle.py#L202" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/_lombscargle.html#LombScargle.model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.LombScargle.model" title="Permalink to this definition">¶</a></dt>
+<code class="descname">model</code><span class="sig-paren">(</span><em>t</em>, <em>frequency</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/_lombscargle.py#L208" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/_lombscargle.html#LombScargle.model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.LombScargle.model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the Lomb-Scargle model at the given frequency</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -297,7 +300,7 @@ heuristic.</p>
 
 <dl class="method">
 <dt id="lombscargle.LombScargle.power">
-<code class="descname">power</code><span class="sig-paren">(</span><em>frequency</em>, <em>normalization='normalized'</em>, <em>method='auto'</em>, <em>assume_regular_frequency=False</em>, <em>method_kwds=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/_lombscargle.py#L145" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/_lombscargle.html#LombScargle.power"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.LombScargle.power" title="Permalink to this definition">¶</a></dt>
+<code class="descname">power</code><span class="sig-paren">(</span><em>frequency</em>, <em>normalization='normalized'</em>, <em>method='auto'</em>, <em>assume_regular_frequency=False</em>, <em>method_kwds=None</em><span class="sig-paren">)</span><a class="reference external" href="http://github.com/jakevdp/lombscargle/tree/master/lombscargle/_lombscargle.py#L148" title="Push the Edit button on the next page"><span class="edit-on-github viewcode-link">&nbsp;[edit on github]</span></a><a class="reference internal" href="../_modules/lombscargle/_lombscargle.html#LombScargle.power"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lombscargle.LombScargle.power" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the Lomb-Scargle power at the given frequencies</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -318,7 +321,10 @@ must be regularly-spaced.</p>
 evenly-spaced frequencies: by default this will be checked unless
 <code class="xref py py-obj docutils literal"><span class="pre">assume_regular_frequency</span></code> is set to True.</li>
 <li><code class="xref py py-obj docutils literal"><span class="pre">slow</span></code>: use the O[N^2] pure-python implementation</li>
-<li><code class="xref py py-obj docutils literal"><span class="pre">matrix</span></code>: use the O[N^2] matrix/linear-fitting implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">chi2</span></code>: use the O[N^2] chi2/linear-fitting implementation</li>
+<li><code class="xref py py-obj docutils literal"><span class="pre">fastchi2</span></code>: use the O[N log N] chi2 implementation. Note that this
+requires evenly-spaced frequencies: by default this will be checked
+unless <code class="xref py py-obj docutils literal"><span class="pre">assume_regular_frequency</span></code> is set to True.</li>
 <li><code class="xref py py-obj docutils literal"><span class="pre">scipy</span></code>: use <code class="docutils literal"><span class="pre">scipy.signal.lombscargle</span></code>, which is an O[N^2]
 implementation written in C. Note that this does not support
 heteroskedastic errors.</li>
@@ -390,7 +396,7 @@ of the input data. This is especially important if <code class="xref py py-obj d
   <p>
     &copy; Copyright 2016, Jake VanderPlas.<br/>
     Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
-    Last built 11 Apr 2016. <br/>
+    Last built 15 Apr 2016. <br/>
   </p>
 </footer>
   </body>

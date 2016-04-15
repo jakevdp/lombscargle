@@ -1,0 +1,8 @@
+
+
+lombscargle_fastchi2
+================================================
+
+.. currentmodule:: lombscargle.implementations
+
+.. autofunction:: lombscargle_fastchi2

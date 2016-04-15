@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>lombscargle._lombscargle &mdash; lombscargle v0.1.dev63</title>
+    <title>lombscargle._lombscargle &mdash; lombscargle v0.1.dev72</title>
     
     <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.1.dev63',
+        VERSION:     '0.1.dev72',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/sidebar.js"></script>
     <link rel="shortcut icon" href="../../_static/astropy_logo.ico"/>
-    <link rel="top" title="lombscargle v0.1.dev63" href="../../index.html" />
+    <link rel="top" title="lombscargle v0.1.dev72" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" />
 <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 <script type="text/javascript" src="../../_static/copybutton.js"></script>
@@ -56,7 +56,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="../../index.html">lombscargle v0.1.dev63</a>
+	<a href="../../index.html">lombscargle v0.1.dev72</a>
 	 &raquo;
       </li>
       <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li>
@@ -186,7 +186,10 @@
 <span class="sd">              evenly-spaced frequencies: by default this will be checked unless</span>
 <span class="sd">              `assume_regular_frequency` is set to True.</span>
 <span class="sd">            - `slow`: use the O[N^2] pure-python implementation</span>
-<span class="sd">            - `matrix`: use the O[N^2] matrix/linear-fitting implementation</span>
+<span class="sd">            - `chi2`: use the O[N^2] chi2/linear-fitting implementation</span>
+<span class="sd">            - `fastchi2`: use the O[N log N] chi2 implementation. Note that this</span>
+<span class="sd">              requires evenly-spaced frequencies: by default this will be checked</span>
+<span class="sd">              unless `assume_regular_frequency` is set to True.</span>
 <span class="sd">            - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]</span>
 <span class="sd">              implementation written in C. Note that this does not support</span>
 <span class="sd">              heteroskedastic errors.</span>
@@ -234,7 +237,10 @@
 <span class="sd">              evenly-spaced frequencies: by default this will be checked unless</span>
 <span class="sd">              `assume_regular_frequency` is set to True.</span>
 <span class="sd">            - `slow`: use the O[N^2] pure-python implementation</span>
-<span class="sd">            - `matrix`: use the O[N^2] matrix/linear-fitting implementation</span>
+<span class="sd">            - `chi2`: use the O[N^2] chi2/linear-fitting implementation</span>
+<span class="sd">            - `fastchi2`: use the O[N log N] chi2 implementation. Note that this</span>
+<span class="sd">              requires evenly-spaced frequencies: by default this will be checked</span>
+<span class="sd">              unless `assume_regular_frequency` is set to True.</span>
 <span class="sd">            - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]</span>
 <span class="sd">              implementation written in C. Note that this does not support</span>
 <span class="sd">              heteroskedastic errors.</span>
@@ -312,7 +318,7 @@
   <p>
     &copy; Copyright 2016, Jake VanderPlas.<br/>
     Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
-    Last built 11 Apr 2016. <br/>
+    Last built 15 Apr 2016. <br/>
   </p>
 </footer>
   </body>

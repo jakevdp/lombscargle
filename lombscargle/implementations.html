@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Periodogram Implementations &mdash; lombscargle v0.1.dev72</title>
+    
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.dev72',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="top" title="lombscargle v0.1.dev72" href="../index.html" />
+    <link rel="up" title="Lomb-Scargle Periodograms (lombscargle)" href="index.html" />
+    <link rel="next" title="Example" href="example.html" />
+    <link rel="prev" title="Quick Start Guide" href="quickstart.html" />
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+<script type="text/javascript" src="../_static/copybutton.js"></script>
+
+
+  </head>
+  <body role="document">
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">astro</span><span id="logotext2">py</span><span id="logotext3">:docs</span></a>
+  <ul>
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="example.html" title="Example">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="quickstart.html" title="Quick Start Guide">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">lombscargle v0.1.dev72</a>
+	 &raquo;
+      </li>
+      <li><a href="index.html" accesskey="U">Lomb-Scargle Periodograms (<code class="docutils literal"><span class="pre">lombscargle</span></code>)</a> &raquo;</li>
+      
+      <li>Periodogram Implementations</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="periodogram-implementations">
+<span id="lombscargle-implementations"></span><h1>Periodogram Implementations<a class="headerlink" href="#periodogram-implementations" title="Permalink to this headline">¶</a></h1>
+<p>This package contains several implementations of the Lomb-Scargle Periodogram,
+which can be selected using the <code class="xref py py-obj docutils literal"><span class="pre">method</span></code> keyword of the Lomb-Scargle power.
+By design all methods will return the same results, though each has its
+advandages and disadganvages.</p>
+<p>For example, to compute a periodogram using the fast chi-square method, you
+can do the following:</p>
+<p>First we generate some data:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">rand</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">rand</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next we compute the periodogram using <code class="docutils literal"><span class="pre">method='fastchi2'</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lombscargle</span> <span class="kn">import</span> <span class="n">LombScargle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frequency</span><span class="p">,</span> <span class="n">power</span> <span class="o">=</span> <span class="n">LombScargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">autopower</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;fastchi2&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="list-of-methods">
+<h2>List of Methods<a class="headerlink" href="#list-of-methods" title="Permalink to this headline">¶</a></h2>
+<p>There are six methods available, listed as follows:</p>
+<div class="section" id="method-auto">
+<h3><code class="docutils literal"><span class="pre">method='auto'</span></code><a class="headerlink" href="#method-auto" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">auto</span></code> method is the default, and will attempt to select the best option
+from the following methods using heuristics driven by the input data.</p>
+</div>
+<div class="section" id="method-slow">
+<h3><code class="docutils literal"><span class="pre">method='slow'</span></code><a class="headerlink" href="#method-slow" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">slow</span></code> method is a pure-Python implementation of the original Lomb-Scargle
+periodogram, enhanced to account for observational noise, and to allow a
+floating mean (sometimes called the <em>generalized periodogram</em>). The method is not
+particularly fast, scaling approximately as <img class="math" src="../_images/math/eab00b2b434f64ee3ac09a64d73da0e3eabde270.png" alt="O[NM]"/>
+for <img class="math" src="../_images/math/75e27f04188974063be3230dca208cd495b77ce1.png" alt="N"/> data points and <img class="math" src="../_images/math/2de38926392ba23abeac75effc66c37a5f5be5fd.png" alt="M"/> frequencies.</p>
+</div>
+<div class="section" id="method-scipy">
+<h3><code class="docutils literal"><span class="pre">method='scipy'</span></code><a class="headerlink" href="#method-scipy" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">scipy</span></code> method wraps the C implementation of the original Lomb-Scargle
+periodogram which is available in <a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle" title="(in SciPy v0.17.0)"><code class="xref py py-func docutils literal"><span class="pre">scipy.signal.lombscargle()</span></code></a>. This is
+slightly faster than the <code class="docutils literal"><span class="pre">slow</span></code> method, but does not allow for errors in
+data or extensions such as the floating mean. The scaling is approximately
+<img class="math" src="../_images/math/eab00b2b434f64ee3ac09a64d73da0e3eabde270.png" alt="O[NM]"/> for <img class="math" src="../_images/math/75e27f04188974063be3230dca208cd495b77ce1.png" alt="N"/> data points and <img class="math" src="../_images/math/2de38926392ba23abeac75effc66c37a5f5be5fd.png" alt="M"/> frequencies.</p>
+</div>
+<div class="section" id="method-fast">
+<h3><code class="docutils literal"><span class="pre">method='fast'</span></code><a class="headerlink" href="#method-fast" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">fast</span></code> method is a pure-Python implementation of the fast periodogram of
+Press &amp; Rybicki. It uses an <em>extirpolation trick</em> to approximate the periodogram
+frequencies using a fast Fourier transform. As with the <code class="docutils literal"><span class="pre">slow</span></code> method, it can
+handle data errors and floating mean. The scaling is approximately
+<img class="math" src="../_images/math/859157910165b4275b02a03f279d0ab5fcb9b2d7.png" alt="O[N\log M]"/> for <img class="math" src="../_images/math/75e27f04188974063be3230dca208cd495b77ce1.png" alt="N"/> data points and <img class="math" src="../_images/math/2de38926392ba23abeac75effc66c37a5f5be5fd.png" alt="M"/> frequencies.</p>
+</div>
+<div class="section" id="method-chi2">
+<h3><code class="docutils literal"><span class="pre">method='chi2'</span></code><a class="headerlink" href="#method-chi2" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">chi2</span></code> method is a pure-Python implementation based on matrix algebra.
+It utilizes the fact that the Lomb-Scargle periodogram at each frequency
+is equivalent to the least-squares fit of a sinusoid to the data. The advantage
+of the <code class="docutils literal"><span class="pre">chi2</span></code> method is that it allows extensions of the periodogram to multiple
+Fourier terms, specified by the <code class="docutils literal"><span class="pre">nterms</span></code> parameter. For the standard problem, it
+is slightly slower than <code class="docutils literal"><span class="pre">method='slow'</span></code> and scales as <img class="math" src="../_images/math/491282e2ed50e9ccfc707234b9760c68399d77ed.png" alt="O[n_fNM]"/>
+for <img class="math" src="../_images/math/75e27f04188974063be3230dca208cd495b77ce1.png" alt="N"/> data points, <img class="math" src="../_images/math/2de38926392ba23abeac75effc66c37a5f5be5fd.png" alt="M"/> frequencies, and <img class="math" src="../_images/math/48876f4ed56aad77eb484a9b3b053e1d58a67916.png" alt="n_f"/> Fourier terms.</p>
+</div>
+<div class="section" id="method-fastchi2">
+<h3><code class="docutils literal"><span class="pre">method='fastchi2'</span></code><a class="headerlink" href="#method-fastchi2" title="Permalink to this headline">¶</a></h3>
+<p>The fast chi-squared method of Palmer (2009) is equivalent to the <code class="docutils literal"><span class="pre">chi2</span></code> method,
+but the matrices are constructed using the FFT-based approach of the <code class="docutils literal"><span class="pre">fast</span></code> method.
+The result is a relatively efficient periodogram (though not nearly as efficient as
+the <code class="docutils literal"><span class="pre">fast</span></code> method) which can be extended to multiple terms. The scaling is
+approximately <img class="math" src="../_images/math/2b587cc8f49d4185c4ef2222b53989614c93043f.png" alt="O[n_f(M + N\log M)]"/> for <img class="math" src="../_images/math/75e27f04188974063be3230dca208cd495b77ce1.png" alt="N"/> data points,
+<img class="math" src="../_images/math/2de38926392ba23abeac75effc66c37a5f5be5fd.png" alt="M"/> frequencies, and <img class="math" src="../_images/math/48876f4ed56aad77eb484a9b3b053e1d58a67916.png" alt="n_f"/> Fourier terms.</p>
+</div>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>The following table summarizes the features of the above algorithms:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="36%" />
+<col width="17%" />
+<col width="19%" />
+<col width="10%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">method</th>
+<th class="head">Computational
+Scaling</th>
+<th class="head">Observational
+Uncertainties</th>
+<th class="head">Bias Term
+(Floating Mean)</th>
+<th class="head">Multiple
+Terms</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">&quot;slow&quot;</span></code></td>
+<td><img class="math" src="../_images/math/eab00b2b434f64ee3ac09a64d73da0e3eabde270.png" alt="O[NM]"/></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">&quot;scipy&quot;</span></code></td>
+<td><img class="math" src="../_images/math/eab00b2b434f64ee3ac09a64d73da0e3eabde270.png" alt="O[NM]"/></td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">&quot;fast&quot;</span></code></td>
+<td><img class="math" src="../_images/math/859157910165b4275b02a03f279d0ab5fcb9b2d7.png" alt="O[N\log M]"/></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">&quot;chi2&quot;</span></code></td>
+<td><img class="math" src="../_images/math/491282e2ed50e9ccfc707234b9760c68399d77ed.png" alt="O[n_fNM]"/></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">&quot;fastchi2&quot;</span></code></td>
+<td><img class="math" src="../_images/math/2b587cc8f49d4185c4ef2222b53989614c93043f.png" alt="O[n_f(M + N\log M)]"/></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>In the Computational Scaling column, <img class="math" src="../_images/math/75e27f04188974063be3230dca208cd495b77ce1.png" alt="N"/> is the number of data points,
+<img class="math" src="../_images/math/2de38926392ba23abeac75effc66c37a5f5be5fd.png" alt="M"/> is the number of frequencies, and <img class="math" src="../_images/math/48876f4ed56aad77eb484a9b3b053e1d58a67916.png" alt="n_f"/> is the number of
+Fourier terms for a multi-term fit.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">Periodogram Implementations</a><ul>
+<li><a class="reference internal" href="#list-of-methods">List of Methods</a><ul>
+<li><a class="reference internal" href="#method-auto"><code class="docutils literal"><span class="pre">method='auto'</span></code></a></li>
+<li><a class="reference internal" href="#method-slow"><code class="docutils literal"><span class="pre">method='slow'</span></code></a></li>
+<li><a class="reference internal" href="#method-scipy"><code class="docutils literal"><span class="pre">method='scipy'</span></code></a></li>
+<li><a class="reference internal" href="#method-fast"><code class="docutils literal"><span class="pre">method='fast'</span></code></a></li>
+<li><a class="reference internal" href="#method-chi2"><code class="docutils literal"><span class="pre">method='chi2'</span></code></a></li>
+<li><a class="reference internal" href="#method-fastchi2"><code class="docutils literal"><span class="pre">method='fastchi2'</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="http://github.com/jakevdp/lombscargle/tree/master/docs/lombscargle/implementations.rst">Edit This Page on Github</a> &nbsp;
+    <a href="../_sources/lombscargle/implementations.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2016, Jake VanderPlas.<br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
+    Last built 15 Apr 2016. <br/>
+  </p>
+</footer>
+  </body>
+</html>

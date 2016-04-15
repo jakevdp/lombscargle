@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lombscargle.implementations.fastchi2_impl &mdash; lombscargle v0.1.dev72</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1.dev72',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/sidebar.js"></script>
+    <link rel="shortcut icon" href="../../../_static/astropy_logo.ico"/>
+    <link rel="top" title="lombscargle v0.1.dev72" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+<script type="text/javascript" src="../../../_static/copybutton.js"></script>
+
+
+  </head>
+  <body role="document">
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../../index.html"><span id="logotext1">astro</span><span id="logotext2">py</span><span id="logotext3">:docs</span></a>
+  <ul>
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../../index.html">lombscargle v0.1.dev72</a>
+	 &raquo;
+      </li>
+      <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for lombscargle.implementations.fastchi2_impl</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">trig_sum</span>
+
+
+<div class="viewcode-block" id="lombscargle_fastchi2"><a class="viewcode-back" href="../../../api/lombscargle.implementations.lombscargle_fastchi2.html#lombscargle.implementations.lombscargle_fastchi2">[docs]</a><span class="k">def</span> <span class="nf">lombscargle_fastchi2</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">Nf</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="s1">&#39;normalized&#39;</span><span class="p">,</span>
+                         <span class="n">fit_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">center_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">nterms</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                         <span class="n">use_fft</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">trig_sum_kwds</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lomb-Scargle Periodogram</span>
+
+<span class="sd">    This implements a fast chi-squared periodogram using the algorithm</span>
+<span class="sd">    outlined in [4]_. The result is identical to the stantard Lomb-Scargle</span>
+<span class="sd">    periodogram. The advantage of this algorithm is the</span>
+<span class="sd">    ability to compute multiterm periodograms relatively quickly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t, y, dy : array_like</span>
+<span class="sd">        times, values, and errors of the data points. These should be</span>
+<span class="sd">        broadcastable to the same shape.</span>
+<span class="sd">    f0, df, Nf : (float, float, int)</span>
+<span class="sd">        parameters describing the frequency grid, f = f0 + df * arange(Nf).</span>
+<span class="sd">    normalization : string (optional, default=&#39;normalized&#39;)</span>
+<span class="sd">        Normalization to use for the periodogram</span>
+<span class="sd">        TODO: figure out what options to use</span>
+<span class="sd">    fit_bias : bool (optional, default=True)</span>
+<span class="sd">        if True, include a constant offet as part of the model at each</span>
+<span class="sd">        frequency. This can lead to more accurate results, especially in then</span>
+<span class="sd">        case of incomplete phase coverage.</span>
+<span class="sd">    center_data : bool (optional, default=True)</span>
+<span class="sd">        if True, pre-center the data by subtracting the weighted mean</span>
+<span class="sd">        of the input data. This is especially important if ``fit_bias = False``</span>
+<span class="sd">    nterms : int (optional, default=1)</span>
+<span class="sd">        Number of Fourier terms in the fit</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    power : array_like</span>
+<span class="sd">        Lomb-Scargle power associated with each frequency.</span>
+<span class="sd">        Units of the result depend on the normalization.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] M. Zechmeister and M. Kurster, A&amp;A 496, 577-584 (2009)</span>
+<span class="sd">    .. [2] W. Press et al, Numerical Recipies in C (2002)</span>
+<span class="sd">    .. [3] Scargle, J.D. ApJ 263:835-853 (1982)</span>
+<span class="sd">    .. [4] Palmer, J. ApJ 695:496-502 (2009)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">nterms</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fit_bias</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot have nterms = 0 without fitting bias&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">dy</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_arrays</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">**</span> <span class="o">-</span><span class="mf">2.0</span>
+    <span class="n">ws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+    <span class="c1"># if fit_bias is true, centering the data now simplifies the math below.</span>
+    <span class="k">if</span> <span class="n">center_data</span> <span class="ow">or</span> <span class="n">fit_bias</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">ws</span>
+
+    <span class="n">yw</span> <span class="o">=</span> <span class="n">y</span> <span class="o">/</span> <span class="n">dy</span>
+    <span class="n">chi2_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">yw</span><span class="p">,</span> <span class="n">yw</span><span class="p">)</span>
+
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">trig_sum_kwds</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">use_fft</span><span class="o">=</span><span class="n">use_fft</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">Nf</span><span class="p">)</span>
+
+    <span class="c1"># Here we build-up the matrices XTX and XTy using pre-computed</span>
+    <span class="c1"># sums. The relevant identities are</span>
+    <span class="c1"># 2 sin(mx) sin(nx) = cos(m-n)x - cos(m+n)x</span>
+    <span class="c1"># 2 cos(mx) cos(nx) = cos(m-n)x + cos(m+n)x</span>
+    <span class="c1"># 2 sin(mx) cos(nx) = sin(m-n)x + sin(m+n)x</span>
+
+    <span class="n">yws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">w</span><span class="p">)</span>
+
+    <span class="n">SCw</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Nf</span><span class="p">),</span> <span class="n">ws</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Nf</span><span class="p">))]</span>
+    <span class="n">SCw</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">trig_sum</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">freq_factor</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nterms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+    <span class="n">Sw</span><span class="p">,</span> <span class="n">Cw</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">SCw</span><span class="p">)</span>
+
+    <span class="n">SCyw</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Nf</span><span class="p">),</span> <span class="n">yws</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Nf</span><span class="p">))]</span>
+    <span class="n">SCyw</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">trig_sum</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">w</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">freq_factor</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nterms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+    <span class="n">Syw</span><span class="p">,</span> <span class="n">Cyw</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">SCyw</span><span class="p">)</span>
+
+    <span class="c1"># Now create an indexing scheme so we can quickly</span>
+    <span class="c1"># build-up matrices at each frequency</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="k">if</span> <span class="n">fit_bias</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="n">order</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">sum</span><span class="p">([[(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span>
+                      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nterms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span> <span class="p">[]))</span>
+
+    <span class="n">funcs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">S</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">Syw</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">i</span><span class="p">],</span>
+                 <span class="n">C</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">Cyw</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">i</span><span class="p">],</span>
+                 <span class="n">SS</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">Cw</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">n</span><span class="p">)][</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">Cw</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="n">n</span><span class="p">][</span><span class="n">i</span><span class="p">]),</span>
+                 <span class="n">CC</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">Cw</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">n</span><span class="p">)][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">Cw</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="n">n</span><span class="p">][</span><span class="n">i</span><span class="p">]),</span>
+                 <span class="n">SC</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">Sw</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">n</span><span class="p">)][</span><span class="n">i</span><span class="p">]</span>
+                                           <span class="o">+</span> <span class="n">Sw</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="n">n</span><span class="p">][</span><span class="n">i</span><span class="p">]),</span>
+                 <span class="n">CS</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">Sw</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">m</span><span class="p">)][</span><span class="n">i</span><span class="p">]</span>
+                                           <span class="o">+</span> <span class="n">Sw</span><span class="p">[</span><span class="n">n</span> <span class="o">+</span> <span class="n">m</span><span class="p">][</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">compute_power</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="n">XTX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">funcs</span><span class="p">[</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">]](</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">B</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">order</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">B</span> <span class="ow">in</span> <span class="n">order</span><span class="p">])</span>
+        <span class="n">XTy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">funcs</span><span class="p">[</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]](</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">order</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">XTy</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">XTX</span><span class="p">,</span> <span class="n">XTy</span><span class="p">))</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">compute_power</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nf</span><span class="p">)])</span>
+
+    <span class="k">if</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s1">&#39;unnormalized&#39;</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">*=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">t</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">ws</span>
+    <span class="k">elif</span> <span class="n">normalization</span> <span class="o">==</span> <span class="s1">&#39;normalized&#39;</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">/=</span> <span class="n">chi2_ref</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;normalization=&#39;{0}&#39; &quot;</span>
+                         <span class="s2">&quot;not recognized&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalization</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">p</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2016, Jake VanderPlas.<br/>
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.5. &nbsp;
+    Last built 15 Apr 2016. <br/>
+  </p>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+
+
+lombscargle_chi2
+============================================
+
+.. currentmodule:: lombscargle.implementations
+
+.. autofunction:: lombscargle_chi2
