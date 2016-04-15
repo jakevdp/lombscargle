@@ -30,6 +30,9 @@ def design_matrix(t, frequency, dy=None, bias=True, nterms=1):
     assert t.ndim == 1
     assert np.isscalar(frequency)
 
+    if nterms == 0 and not bias:
+        raise ValueError("cannot have nterms=0 and no bias")
+
     if bias:
         cols = [np.ones_like(t)]
     else:
