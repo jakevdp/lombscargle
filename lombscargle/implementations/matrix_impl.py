@@ -6,7 +6,7 @@ from .mle import design_matrix
 
 
 def lombscargle_matrix(t, y, dy, frequency, normalization='normalized',
-                       fit_bias=True, center_data=True):
+                       fit_bias=True, center_data=True, nterms=1):
     """Lomb-Scargle Periodogram
 
     This implements a matrix-based periodogram, which is relatively slow but
@@ -29,6 +29,8 @@ def lombscargle_matrix(t, y, dy, frequency, normalization='normalized',
     center_data : bool (optional, default=True)
         if True, pre-center the data by subtracting the weighted mean
         of the input data. This is especially important if ``fit_bias = False``
+    nterms : int (optional, default=1)
+        Number of Fourier terms in the fit
 
     Returns
     -------
@@ -62,7 +64,7 @@ def lombscargle_matrix(t, y, dy, frequency, normalization='normalized',
 
     # compute the unnormalized model chi2 at each frequency
     def compute_power(f):
-        X = design_matrix(t, f, dy=dy, bias=fit_bias)
+        X = design_matrix(t, f, dy=dy, bias=fit_bias, nterms=nterms)
         XTX = np.dot(X.T, X)
         XTy = np.dot(X.T, yw)
         return np.dot(XTy.T, np.linalg.solve(XTX, XTy))

@@ -12,12 +12,14 @@ from .slow_impl import lombscargle_slow
 from .fast_impl import lombscargle_fast
 from .scipy_impl import lombscargle_scipy
 from .matrix_impl import lombscargle_matrix
+from .fastmatrix_impl import lombscargle_fastmatrix
 
 
 METHODS = {'slow': lombscargle_slow,
            'fast': lombscargle_fast,
            'matrix': lombscargle_matrix,
-           'scipy': lombscargle_scipy}
+           'scipy': lombscargle_scipy,
+           'fastmatrix': lombscargle_fastmatrix}
 
 
 def _validate_inputs(t, y, dy=None, frequency=None, strip_units=True):
@@ -158,7 +160,7 @@ def lombscargle(t, y, dy=None,
                 assume_regular_frequency=False,
                 normalization='normalized',
                 fit_bias=True, center_data=True,
-                method_kwds=None):
+                method_kwds=None, nterms=1):
     """
     Compute the Lomb-scargle Periodogram with a given method.
 
@@ -222,13 +224,23 @@ def lombscargle(t, y, dy=None,
     frequency = frequency.ravel()
 
     if method == 'auto':
-        if len(frequency) > 100 and _is_regular(frequency,
-                                                assume_regular_frequency):
+        if nterms != 1:
+            if len(frequency) > 100 and _is_regular(frequency,
+                                                    assume_regular_frequency):
+                method = 'fastmatrix'
+            else:
+                method = 'matrix'
+        elif len(frequency) > 100 and _is_regular(frequency,
+                                                  assume_regular_frequency):
             method = 'fast'
         elif dy is None and not fit_bias:
             method = 'scipy'
         else:
             method = 'slow'
+
+    if nterms != 1 and method not in ['matrix', 'fastmatrix']:
+        raise ValueError("nterms != 1 only supported with 'matrix' "
+                         "or 'fastmatrix' methods")
 
     if method == 'fast':
         f0, df, Nf = _get_frequency_grid(frequency, assume_regular_frequency)
@@ -243,6 +255,13 @@ def lombscargle(t, y, dy=None,
                                 center_data=center_data,
                                 normalization=normalization,
                                 **(method_kwds or {}))
+    elif method in ['matrix', 'fastmatrix']:
+        PLS = METHODS[method](t, y, dy=dy, frequency=frequency,
+                              center_data=center_data,
+                              fit_bias=fit_bias,
+                              normalization=normalization,
+                              nterms=nterms,
+                              **(method_kwds or {}))
     else:
         PLS = METHODS[method](t, y, dy=dy, frequency=frequency,
                               center_data=center_data,
