@@ -6,7 +6,7 @@ from .utils import trig_sum
 from .mle import design_matrix
 
 
-def lombscargle_fastmatrix(t, y, dy, frequency, normalization='normalized',
+def lombscargle_fastmatrix(t, y, dy, f0, df, Nf, normalization='normalized',
                            fit_bias=True, center_data=True, nterms=1,
                            use_fft=True, trig_sum_kwds=None):
     """Lomb-Scargle Periodogram
@@ -20,8 +20,8 @@ def lombscargle_fastmatrix(t, y, dy, frequency, normalization='normalized',
     t, y, dy : array_like
         times, values, and errors of the data points. These should be
         broadcastable to the same shape.
-    frequency : array_like
-        frequencies (not angular frequencies) at which to calculate periodogram
+    f0, df, Nf : (float, float, int)
+        parameters describing the frequency grid, f = f0 + df * arange(Nf).
     normalization : string (optional, default='normalized')
         Normalization to use for the periodogram
         TODO: figure out what options to use
@@ -55,16 +55,8 @@ def lombscargle_fastmatrix(t, y, dy, frequency, normalization='normalized',
         dy = 1
 
     t, y, dy = np.broadcast_arrays(t, y, dy)
-    frequency = np.asarray(frequency)
 
     assert t.ndim == 1
-    assert frequency.ndim == 1
-
-    # Get frequency grid
-    f0 = frequency[0]
-    df = frequency[1] - frequency[0]
-    Nf = len(frequency)
-    assert np.allclose(frequency, f0 + df * np.arange(Nf))
 
     w = dy ** -2.0
     ws = np.sum(w)

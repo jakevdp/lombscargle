@@ -9,7 +9,7 @@ except ImportError:
     HAS_SCIPY = False
 
 
-def lombscargle_scipy(t, y, dy, frequency, normalization='normalized',
+def lombscargle_scipy(t, y, frequency, normalization='normalized',
                       center_data=True):
     """Lomb-Scargle Periodogram
 
@@ -19,7 +19,7 @@ def lombscargle_scipy(t, y, dy, frequency, normalization='normalized',
 
     Parameters
     ----------
-    t, y, dy : array_like
+    t, y: array_like
         times, values, and errors of the data points. These should be
         broadcastable to the same shape.
     frequency : array_like
@@ -45,13 +45,6 @@ def lombscargle_scipy(t, y, dy, frequency, normalization='normalized',
     """
     if not HAS_SCIPY:
         raise ValueError("scipy must be installed to use lombscargle_scipy")
-
-    if dy is not None:
-        dy = np.ravel(np.asarray(dy))
-        if dy.size != 1:
-            if not np.allclose(dy[0], dy):
-                raise ValueError("scipy method only supports "
-                                 "uniform uncertainties dy")
 
     t, y = np.broadcast_arrays(t, y)
     frequency = np.asarray(frequency)

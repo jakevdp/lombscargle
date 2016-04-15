@@ -207,6 +207,9 @@ def lombscargle(t, y, dy=None,
         of the input data. This is especially important if `fit_bias = False`
     method_kwds : dict (optional)
         additional keywords to pass to the lomb-scargle method
+    nterms : int (default=1)
+        number of Fourier terms to use in the periodogram.
+        Not supported with every method.
 
     Returns
     -------
@@ -223,6 +226,7 @@ def lombscargle(t, y, dy=None,
     output_shape = frequency.shape
     frequency = frequency.ravel()
 
+    # automatically choose the appropiate method
     if method == 'auto':
         if nterms != 1:
             if len(frequency) > 100 and _is_regular(frequency,
@@ -238,35 +242,37 @@ def lombscargle(t, y, dy=None,
         else:
             method = 'slow'
 
-    if nterms != 1 and method not in ['matrix', 'fastmatrix']:
-        raise ValueError("nterms != 1 only supported with 'matrix' "
-                         "or 'fastmatrix' methods")
+    # we'll need to adjust args and kwds for each method
+    args = (t, y, dy)
+    kwds = dict(frequency=frequency,
+                center_data=center_data,
+                fit_bias=fit_bias,
+                normalization=normalization,
+                nterms=nterms,
+                **(method_kwds or {}))
 
-    if method == 'fast':
-        f0, df, Nf = _get_frequency_grid(frequency, assume_regular_frequency)
-        PLS = lombscargle_fast(t, y, dy=dy, f0=f0, df=df, Nf=Nf,
-                               center_data=center_data,
-                               fit_bias=fit_bias,
-                               normalization=normalization,
-                               **(method_kwds or {}))
-    elif method == 'scipy':
-        assert not fit_bias
-        PLS = lombscargle_scipy(t, y, dy=dy, frequency=frequency,
-                                center_data=center_data,
-                                normalization=normalization,
-                                **(method_kwds or {}))
-    elif method in ['matrix', 'fastmatrix']:
-        PLS = METHODS[method](t, y, dy=dy, frequency=frequency,
-                              center_data=center_data,
-                              fit_bias=fit_bias,
-                              normalization=normalization,
-                              nterms=nterms,
-                              **(method_kwds or {}))
-    else:
-        PLS = METHODS[method](t, y, dy=dy, frequency=frequency,
-                              center_data=center_data,
-                              fit_bias=fit_bias,
-                              normalization=normalization,
-                              **(method_kwds or {}))
+    # scipy doesn't support dy or fit_bias=True
+    if method == 'scipy':
+        if kwds.pop('fit_bias'):
+            raise ValueError("scipy method does not support fit_bias=True")
+        if dy is not None:
+            dy = np.ravel(np.asarray(dy))
+            if not np.allclose(dy[0], dy):
+                raise ValueError("scipy method only supports "
+                                 "uniform uncertainties dy")
+        args = (t, y)
 
+    # fast methods require frequency expressed as a grid
+    if method.startswith('fast'):
+        f0, df, Nf = _get_frequency_grid(kwds.pop('frequency'),
+                                         assume_regular_frequency)
+        kwds.update(f0=f0, df=df, Nf=Nf)
+
+    # only matrix methods support nterms
+    if not method.endswith('matrix'):
+        if kwds.pop('nterms') != 1:
+            raise ValueError("nterms != 1 only supported with 'matrix' "
+                             "or 'fastmatrix' methods")
+
+    PLS = METHODS[method](*args, **kwds)
     return PLS.reshape(output_shape) * unit_dict['power']

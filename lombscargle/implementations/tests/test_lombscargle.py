@@ -9,6 +9,7 @@ from .. import lombscargle
 ALL_METHODS = ['auto', 'slow', 'fast', 'scipy', 'matrix', 'fastmatrix']
 BIAS_METHODS = ['auto', 'slow', 'fast', 'matrix', 'fastmatrix']
 NTERMS_METHODS = ['auto', 'matrix', 'fastmatrix']
+FAST_METHODS = ['fast', 'fastmatrix']
 
 
 @pytest.fixture
@@ -95,3 +96,47 @@ def test_lombscargle_nterms(method, center_data, fit_bias, with_errors, nterms,
         output = lombscargle(t, y, dy, frequency=freq, method=method, **kwds)
 
         assert_allclose(output, expected_output, rtol=1E-7, atol=1E-20)
+
+
+@pytest.mark.parametrize('method', FAST_METHODS)
+@pytest.mark.parametrize('center_data', [True])
+@pytest.mark.parametrize('fit_bias', [True, False])
+@pytest.mark.parametrize('with_errors', [True, False])
+@pytest.mark.parametrize('nterms', range(4))
+@pytest.mark.parametrize('normalization', ['normalized', 'unnormalized'])
+def test_fast_methods(method, center_data, fit_bias, with_errors,
+                      nterms, normalization, data):
+    t, y, dy = data
+    if not with_errors:
+        dy = None
+
+    freq = 0.8 + 0.005 * np.arange(100)
+
+    kwds = dict(method=method,
+                normalization=normalization,
+                center_data=center_data,
+                fit_bias=fit_bias,
+                nterms=nterms)
+
+    if method == 'fast' and nterms != 1:
+        with pytest.raises(ValueError) as err:
+            lombscargle(t, y, frequency=freq, **kwds)
+        assert 'nterms' in str(err.value)
+        return
+
+    if nterms == 0 and not fit_bias:
+        with pytest.raises(ValueError) as err:
+            lombscargle(t, y, frequency=freq, **kwds)
+        assert 'nterms' in str(err.value) and 'bias' in str(err.value)
+        return
+
+    output_slow = lombscargle(t, y, dy, frequency=freq,
+                              method_kwds=dict(use_fft=False),
+                              **kwds)
+    output_fast = lombscargle(t, y, dy, frequency=freq,
+                              method_kwds=dict(use_fft=True),
+                              **kwds)
+
+    Pmax = output_slow.max()
+
+    assert_allclose(output_slow, output_fast, atol=Pmax * 1E-2)
