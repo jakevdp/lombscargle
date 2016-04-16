@@ -41,7 +41,7 @@ particularly fast, scaling approximately as :math:`O[NM]`
 for :math:`N` data points and :math:`M` frequencies.
 
 ``method='scipy'``
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 The ``scipy`` method wraps the C implementation of the original Lomb-Scargle
 periodogram which is available in :func:`scipy.signal.lombscargle`. This is
 slightly faster than the ``slow`` method, but does not allow for errors in
