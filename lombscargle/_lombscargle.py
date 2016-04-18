@@ -71,7 +71,19 @@ class LombScargle(object):
 
     def autofrequency(self, samples_per_peak=5, nyquist_factor=5,
                       minimum_frequency=None, maximum_frequency=None):
-        """Determine a suitable frequency grid for data
+        """Determine a suitable frequency grid for data.
+
+        Note that this assumes the peak width is driven by the observational
+        baseline, which is generally a good assumption when the baseline is
+        much larger than the oscillation period.
+        If you are searching for periods longer than the baseline of your
+        observations, this may not perform well.
+
+        Even with a large baseline, be aware that the maximum frequency returned
+        is based on the concept of "average Nyquist frequency", which may not be
+        useful for irregularly-sampled data. The maximum frequency can be
+        adjusted via the `nyquist_factor` argument, or through the
+        `maximum_frequency` argument.
 
         Parameters
         ----------
@@ -112,7 +124,7 @@ class LombScargle(object):
 
     def autopower(self, method='auto', method_kwds=None,
                   normalization='normalized',**kwargs):
-        """Compute the Lomb-Scargle power at the given frequencies
+        """Compute Lomb-Scargle power at automatically-determined frequencies
 
         Parameters
         ----------

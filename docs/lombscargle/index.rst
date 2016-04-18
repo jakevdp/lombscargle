@@ -46,5 +46,3 @@ API Reference
 .. automodapi:: lombscargle
 
 .. automodapi:: lombscargle.implementations
-
-.. automodapi:: lombscargle.heuristics
