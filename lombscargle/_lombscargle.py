@@ -1,7 +1,6 @@
 """Main Lomb-Scargle Implementation"""
 import numpy as np
 
-from .heuristics import Heuristic
 from .implementations import lombscargle
 from .implementations.mle import periodic_fit
 
@@ -70,39 +69,53 @@ class LombScargle(object):
         self.fit_bias = fit_bias
         self.center_data = center_data
 
-    @classmethod
-    def autofrequency(cls, t, y, dy, heuristic='baseline', **kwargs):
+    def autofrequency(self, samples_per_peak=5, nyquist_factor=5,
+                      minimum_frequency=None, maximum_frequency=None):
         """Determine a suitable frequency grid for data
 
         Parameters
         ----------
-        t : array_like or Quantity
-            The sampling times of the data
-        heuristic : string
-            The type of heuristic to use. Currently only 'baseline' is
-            supported
-        **kwargs :
-            additional keyword arguments will be passed to the frequency
-            heuristic.
+        samples_per_peak : float (optional, default=5)
+            The approximate number of desired samples across the typical peak
+        nyquist_factor : float (optional, default=5)
+            The multiple of the average nyquist frequency used to choose the
+            maximum frequency if ``maximum_frequency`` is not provided.
+        minimum_frequency : float (optional)
+            If specified, then use this minimum frequency rather than one
+            chosen based on the size of the baseline.
+        maximum_frequency : float (optional)
+            If specified, then use this maximum frequency rather than one
+            chosen based on the average nyquist frequency.
 
         Returns
         -------
         frequency : ndarray or Quantity
             The heuristically-determined optimal frequency bin
         """
-        heuristic = Heuristic.get(heuristic)
-        return heuristic.frequency_grid(t, y, dy, **kwargs)
+        t = np.asanyarray(self.t)
+        baseline = t.max() - t.min()
+        n_samples = t.size
 
-    def autopower(self, frequency_heuristic='baseline',
-                  method='auto', method_kwds=None,
+        df = 1. / baseline / samples_per_peak
+
+        if minimum_frequency is not None:
+            f0 = minimum_frequency
+        else:
+            f0 = 0.5 * df
+
+        if maximum_frequency is not None:
+            Nf = int(np.ceil((maximum_frequency - f0) / df))
+        else:
+            Nf = int(0.5 * samples_per_peak * nyquist_factor * n_samples)
+
+        return f0 + df * np.arange(Nf)
+
+    def autopower(self, method='auto', method_kwds=None,
                   normalization='normalized',**kwargs):
         """Compute the Lomb-Scargle power at the given frequencies
 
         Parameters
         ----------
-        frequency_heuristic : string (optional, default='baseline')
-            the frequency heuristic to use. By default, it is assumed that the
-            observation baseline will drive the peak width.
         method : string (optional)
             specify the lomb scargle implementation to use. Options are:
 
@@ -125,17 +138,14 @@ class LombScargle(object):
             Normalization to use for the periodogram.
             Options are 'normalized' or 'unnormalized'.
         **kwargs :
-            additional keyword arguments will be passed to the frequency
-            heuristic.
+            additional keyword arguments will be passed to autofrequency()
 
         Returns
         -------
         frequency, power : ndarrays
             The frequency and Lomb-Scargle power
         """
-        frequency = self.autofrequency(self.t, self.y, self.dy,
-                                       heuristic=frequency_heuristic,
-                                       **kwargs)
+        frequency = self.autofrequency(**kwargs)
 
         power = lombscargle(self.t, self.y, self.dy,
                             frequency=frequency,

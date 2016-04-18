@@ -7,8 +7,6 @@ from astropy import units
 from .. import LombScargle
 from ..implementations import lombscargle_slow, lombscargle
 
-from ..heuristics import BaselineHeuristic
-
 METHOD_NAMES = ['auto', 'fast', 'slow', 'scipy', 'chi2', 'fastchi2']
 
 
@@ -87,7 +85,7 @@ def test_common_interface(method, center_data, freq, data):
     t, y, dy = data
 
     if freq is None:
-        freq_expected = BaselineHeuristic().frequency_grid(t)
+        freq_expected = LombScargle(t, y, dy).autofrequency(t)
     else:
         freq_expected = freq
 
