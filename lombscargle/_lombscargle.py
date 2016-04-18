@@ -1,7 +1,7 @@
 """Main Lomb-Scargle Implementation"""
 import numpy as np
 
-from .heuristics import get_heuristic
+from .heuristics import Heuristic
 from .implementations import lombscargle
 from .implementations.mle import periodic_fit
 
@@ -71,7 +71,7 @@ class LombScargle(object):
         self.center_data = center_data
 
     @classmethod
-    def autofrequency(cls, t, heuristic='baseline', **kwds):
+    def autofrequency(cls, t, y, dy, heuristic='baseline', **kwargs):
         """Determine a suitable frequency grid for data
 
         Parameters
@@ -81,7 +81,7 @@ class LombScargle(object):
         heuristic : string
             The type of heuristic to use. Currently only 'baseline' is
             supported
-        **kwds :
+        **kwargs :
             additional keyword arguments will be passed to the frequency
             heuristic.
 
@@ -90,9 +90,8 @@ class LombScargle(object):
         frequency : ndarray or Quantity
             The heuristically-determined optimal frequency bin
         """
-        t = np.asanyarray(t)
-        heuristic = get_heuristic(heuristic)
-        return heuristic(n_samples=len(t), baseline=t.max() - t.min(), **kwds)
+        heuristic = Heuristic.get(heuristic)
+        return heuristic.frequency_grid(t, y, dy, **kwargs)
 
     def autopower(self, frequency_heuristic='baseline',
                   method='auto', method_kwds=None,
@@ -113,9 +112,9 @@ class LombScargle(object):
               `assume_regular_frequency` is set to True.
             - `slow`: use the O[N^2] pure-python implementation
             - `chi2`: use the O[N^2] chi2/linear-fitting implementation
-            - `fastchi2`: use the O[N log N] chi2 implementation. Note that this
-              requires evenly-spaced frequencies: by default this will be checked
-              unless `assume_regular_frequency` is set to True.
+            - `fastchi2`: use the O[N log N] chi2 implementation. Note that
+              this requires evenly-spaced frequencies: by default this will be
+              checked unless `assume_regular_frequency` is set to True.
             - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]
               implementation written in C. Note that this does not support
               heteroskedastic errors.
@@ -123,8 +122,8 @@ class LombScargle(object):
         method_kwds : dict (optional)
             additional keywords to pass to the lomb-scargle method
         normalization : string (optional, default='normalized')
-            Normalization to use for the periodogram. Options are 'normalized' or
-            'unnormalized'.
+            Normalization to use for the periodogram.
+            Options are 'normalized' or 'unnormalized'.
         **kwargs :
             additional keyword arguments will be passed to the frequency
             heuristic.
@@ -134,7 +133,9 @@ class LombScargle(object):
         frequency, power : ndarrays
             The frequency and Lomb-Scargle power
         """
-        frequency = self.autofrequency(self.t, frequency_heuristic, **kwargs)
+        frequency = self.autofrequency(self.t, self.y, self.dy,
+                                       heuristic=frequency_heuristic,
+                                       **kwargs)
 
         power = lombscargle(self.t, self.y, self.dy,
                             frequency=frequency,
@@ -164,9 +165,9 @@ class LombScargle(object):
               `assume_regular_frequency` is set to True.
             - `slow`: use the O[N^2] pure-python implementation
             - `chi2`: use the O[N^2] chi2/linear-fitting implementation
-            - `fastchi2`: use the O[N log N] chi2 implementation. Note that this
-              requires evenly-spaced frequencies: by default this will be checked
-              unless `assume_regular_frequency` is set to True.
+            - `fastchi2`: use the O[N log N] chi2 implementation. Note that
+              this requires evenly-spaced frequencies: by default this will be
+              checked unless `assume_regular_frequency` is set to True.
             - `scipy`: use ``scipy.signal.lombscargle``, which is an O[N^2]
               implementation written in C. Note that this does not support
               heteroskedastic errors.
