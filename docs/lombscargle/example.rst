@@ -1,4 +1,3 @@
-
 .. _lombscargle-example:
 
 
@@ -32,7 +31,7 @@ with lightcurve shape that is more complicated than a simple sine wave:
         dmag = 0.01 + 0.03 * rand.rand(N)
 
         omega = 2 * np.pi / period
-        n = np.arange(6)[:, None]
+        n = np.arange(1 + len(coeffs) // 2)[:, None]
 
         mag = (15 + dmag * rand.randn(N)
                + np.dot(coeffs[::2], np.cos(n * omega * t)) +
@@ -55,7 +54,7 @@ with lightcurve shape that is more complicated than a simple sine wave:
 
     # set up the figure & axes for plotting
     fig, ax = plt.subplots(1, 2, figsize=(12, 5))
-    fig.suptitle('Lomb-Scargle Periodogram (period=0.4 days)')
+    fig.suptitle('Lomb-Scargle Periodogram (period=0.41 days)')
     fig.subplots_adjust(bottom=0.12, left=0.07, right=0.95)
     inset = fig.add_axes([0.78, 0.56, 0.15, 0.3])
 

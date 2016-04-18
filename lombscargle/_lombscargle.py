@@ -81,7 +81,7 @@ class LombScargle(object):
         heuristic : string
             The type of heuristic to use. Currently only 'baseline' is
             supported
-        **kwargs :
+        **kwds :
             additional keyword arguments will be passed to the frequency
             heuristic.
 
