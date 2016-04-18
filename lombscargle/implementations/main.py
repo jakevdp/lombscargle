@@ -4,6 +4,8 @@ Main Lomb-Scargle Implementation
 The ``lombscargle`` function here is essentially a sophisticated switch
 statement for the various implementations available in this submodule
 """
+import warnings
+
 import numpy as np
 from astropy import units
 from astropy.utils.compat.numpy import broadcast_arrays
@@ -154,6 +156,36 @@ def _is_regular(frequency, assume_regular_frequency=False):
         return np.allclose(diff[0], diff)
 
 
+def _validate_method(method, dy, fit_bias, nterms,
+                     frequency, assume_regular_frequency):
+    fast_method_ok = hasattr(np.ufunc, 'at')
+    if not fast_method_ok:
+        warnings.warn("Fast Lomb-Scargle methods require numpy version 1.8 "
+                      "or newer. Using slower methods instead.")
+
+    # automatically choose the appropiate method
+    if method == 'auto':
+        if nterms != 1:
+            if (fast_method_ok and len(frequency) > 100
+                    and _is_regular(frequency, assume_regular_frequency)):
+                method = 'fastchi2'
+            else:
+                method = 'chi2'
+        elif (fast_method_ok and len(frequency) > 100
+              and _is_regular(frequency, assume_regular_frequency)):
+            method = 'fast'
+        elif dy is None and not fit_bias:
+            method = 'scipy'
+        else:
+            method = 'slow'
+
+
+    if method not in METHODS:
+        raise ValueError("invalid method: {0}".format(method))
+
+    return method
+
+
 def lombscargle(t, y, dy=None,
                 frequency=None,
                 method='auto',
@@ -229,22 +261,6 @@ def lombscargle(t, y, dy=None,
     output_shape = frequency.shape
     frequency = frequency.ravel()
 
-    # automatically choose the appropiate method
-    if method == 'auto':
-        if nterms != 1:
-            if len(frequency) > 100 and _is_regular(frequency,
-                                                    assume_regular_frequency):
-                method = 'fastchi2'
-            else:
-                method = 'chi2'
-        elif len(frequency) > 100 and _is_regular(frequency,
-                                                  assume_regular_frequency):
-            method = 'fast'
-        elif dy is None and not fit_bias:
-            method = 'scipy'
-        else:
-            method = 'slow'
-
     # we'll need to adjust args and kwds for each method
     args = (t, y, dy)
     kwds = dict(frequency=frequency,
@@ -253,6 +269,10 @@ def lombscargle(t, y, dy=None,
                 normalization=normalization,
                 nterms=nterms,
                 **(method_kwds or {}))
+
+    method = _validate_method(method, dy=dy, fit_bias=fit_bias, nterms=nterms,
+                              frequency=frequency,
+                              assume_regular_frequency=assume_regular_frequency)
 
     # scipy doesn't support dy or fit_bias=True
     if method == 'scipy':

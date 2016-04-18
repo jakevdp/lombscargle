@@ -9,4 +9,6 @@ use with [astropy](http://astropy.org). The implementation is based on the
 [gatspy](http://astroml.org/gatspy/) package, but is enhanced to work within
 the ``astropy.units`` framework.
 
+The fast periodogram functionality requires numpy 1.8 or newer.
+
 The documentation build can be found at http://jakevdp.github.io/lombscargle/
