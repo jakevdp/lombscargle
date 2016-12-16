@@ -1,5 +1,7 @@
 # Lomb-Scargle periodograms for astropy
 
+**Note: the code here is now part of astropy and this repository is no longer maintained.**
+
 [![build status](http://img.shields.io/travis/jakevdp/lombscargle/master.svg?style=flat)](https://travis-ci.org/jakevdp/lombscargle)
 [![license](http://img.shields.io/badge/license-BSD-blue.svg?style=flat)](https://github.com/jakevdp/lombscargle/blob/master/LICENSE.rst)
 [![powered by astropy](http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat)](http://www.astropy.org)
